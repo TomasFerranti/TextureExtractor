@@ -1,5 +1,6 @@
 body {
     margin: 0px;
+    background: #f1f3f5;
 }
 
 #universo {
@@ -22,12 +23,17 @@ body {
 button {
     width: 16.35%;
     height: 100%;
+    background: lightgray;
+    cursor: pointer;
 }
 
 canvas {
     display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
     margin-left: auto;
     margin-right: auto;
+    background: white;
 }
 
 #imagem_div{
