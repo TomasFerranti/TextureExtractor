@@ -1,0 +1,42 @@
+body {
+    margin: 0px;
+}
+
+#universo {
+    position: relative;
+    width: 80%;
+    height: auto;
+    margin: 0 auto;
+    /* margin: 20px 20px 20px;
+    */
+    border: 1px solid black;
+}
+
+#controles {
+    position: relative;
+    height: 50px;
+    padding: 10px;
+    /*margin: 20px 20px 20px;
+    */
+    border: 1px solid black;
+}
+
+#imagem_div{
+    position: relative;
+    height: auto;
+    padding: 10px;
+    margin: 0 auto;
+    /*margin: 20px 20px 20px;
+    */
+    border: 1px solid black;
+}
+
+#textura_div{
+    position: relative;
+    height: auto;
+    padding: 10px;
+    margin: 0 auto;
+    /*margin: 20px 20px 20px;
+    */
+    border: 1px solid black;
+}

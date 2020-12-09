@@ -1,9 +1,29 @@
 <html>
 <head>
-<title> Testando </title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title> Projeto Imagine-Rio v1 </title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<script type="text/javascript" src="scripts/test1.js"></script>
 <body>
-
+    <div id='universo'>
+        <div id='controles'>
+            <button onclick="updateFigure1()">Load File</button>
+            <button id = "bt_guiaX">Eixo X</button>
+            <button id = "bt_guiaY">Eixo Y</button>
+            <button id = "bt_guiaZ">Eixo Z</button>
+            <button id = "bt_confirm">Calcular</button>
+            <button id = "bt_extrair">Extrair</button>
+        </div>
+        <div id='imagem_div'>
+            <canvas id = "imagem_canvas" height="800" width="1200"></canvas>        
+        </div>
+        <div id='textura_div'>
+            <canvas id = "textura_canvas" height="400" width="400"></canvas>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js"></script>
+    <script type="text/javascript" src="scripts/test1.js"></script>
+    <script type="text/javascript" src="scripts/test2.js"></script>
 </body>
 </html>
