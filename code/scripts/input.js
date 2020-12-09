@@ -26,6 +26,12 @@ document.getElementById("bt_carregar").addEventListener("click", function () {
 document.getElementById("bt_calcular").addEventListener("click", function () {
 	calc();
 	update();
+	// tirar versão final
+	point(pontos_de_fuga.get(0,0),pontos_de_fuga.get(0,1),10,"red");
+	point(pontos_de_fuga.get(1,0),pontos_de_fuga.get(1,1),10,"blue");
+	point(pontos_de_fuga.get(2,0),pontos_de_fuga.get(2,1),10,"green");
+	point(C.get(0,0),C.get(0,1),10,"pink");
+	// até aqui
 });
 
 lastButton = "";
