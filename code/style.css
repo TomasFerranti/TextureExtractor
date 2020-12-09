@@ -14,29 +14,32 @@ body {
 
 #controles {
     position: relative;
-    height: 50px;
-    padding: 10px;
-    /*margin: 20px 20px 20px;
-    */
+    height: 10%;
+    margin: 0px;
     border: 1px solid black;
+}
+
+button {
+    width: 16.35%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #imagem_div{
     position: relative;
     height: auto;
-    padding: 10px;
     margin: 0 auto;
-    /*margin: 20px 20px 20px;
-    */
     border: 1px solid black;
 }
 
 #textura_div{
     position: relative;
     height: auto;
-    padding: 10px;
     margin: 0 auto;
-    /*margin: 20px 20px 20px;
-    */
     border: 1px solid black;
 }
