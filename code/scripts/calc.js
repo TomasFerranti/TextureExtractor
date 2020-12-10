@@ -1,5 +1,6 @@
 var pontos_de_fuga = nj.array([]).reshape(-1,2);
 var C = nj.array([]).reshape(-1,3);  
+var base_XYZ = nj.zeros([3,3]);
 
 function calc(){
     if (pontos_guia[0].shape[0] < 4 || pontos_guia[1].shape[0] < 4 || pontos_guia[2].shape[0] < 4){
@@ -43,7 +44,31 @@ function calc(){
                     ((Fy.get(0,0) - CO.get(0,0))**2 + (Fy.get(0,1) - CO.get(0,1))**2);
 
         C = nj.array([CO.get(0,0), CO.get(0,1), (z2/2)**(1/2)]).reshape(-1,3);        
+
+        // base XYZ        
+        var Fx = add_hom(pontos_de_fuga.slice([0,1]));
+        var Fy = add_hom(pontos_de_fuga.slice([1,2]));
+        var Fz = add_hom(pontos_de_fuga.slice([2,3]));
+        var X = normalize(nj.subtract(Fx, C));
+        var Y = normalize(nj.subtract(Fy, C));
+        var Z = normalize(nj.subtract(Fz, C));
+        base_XYZ = nj.concatenate(X.reshape(3,-1),Y.reshape(3,-1),Z.reshape(3,-1));
+
+        print_results();
     }
 }
 
+var v = [];
+var P = [];
+function extract_texture(){
+    v = [pontos_extrair.slice([0,1]), 0, pontos_extrair.slice([1,2]), 0];
+    print_array(v[0]);
+    P = [unProject(v[0],"Y"), 0, unProject(v[2],"Y"), 0];
+    P[1] = nj.array([P[2].get(0,0),1,P[0].get(0,2)]).reshape(1,3);
+    P[3] = nj.array([P[0].get(0,0),1,P[2].get(0,1)]).reshape(1,3);
+    v[1] = rem_hom(project(P[1]));
+    v[3] = rem_hom(project(P[3]));
 
+    // atualizar pontos_extrair para desenhar
+    pontos_extrair = nj.concatenate(v).reshape(-1,2);
+}

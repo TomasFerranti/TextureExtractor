@@ -5,7 +5,7 @@ var imgCtx = imgCanvas.getContext("2d");
 
 var imgImagem = new Image();
 imgImagem.crossOrigin = "";
-imgImagem.src = "";
+imgImagem.src = "https://raw.githubusercontent.com/TomasFerranti/ImagineRio/main/code/sample_images/imagem_atilio.png";
 
 imgImagem.onload = function(){
 	imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
@@ -19,7 +19,7 @@ imgImagem.onload = function(){
 document.getElementById("bt_carregar").addEventListener("click", function () {
 	x = prompt("Por favor insira a URL da imagem desejada.");
 	imgImagem.src = x;
-	clearVariables();
+	clear_all();
 	update();
 });
 
@@ -63,19 +63,39 @@ var pontos_extrair = nj.array([]).reshape(-1,2);
 // Clicou no canvas
 imgCanvas.addEventListener("click", function (e) {
 	var rect = imgCanvas.getBoundingClientRect();
-	var mouse = nj.array([e.pageX-rect.x,e.pageY-rect.y]).reshape(2,-1);
+	var mouse = nj.array([e.pageX-rect.x-window.pageXOffset,e.pageY-rect.y-window.pageYOffset]).reshape(2,-1);
 	switch (lastButton){
 		case "X":
 			pontos_guia[0] = nj.concatenate(pontos_guia[0].T,mouse).T;
+			clear_camera();
 			break;
 		case "Y":
 			pontos_guia[1] = nj.concatenate(pontos_guia[1].T,mouse).T;
+			clear_camera();
 			break;
 		case "Z":
 			pontos_guia[2] = nj.concatenate(pontos_guia[2].T,mouse).T;
+			clear_camera();
 			break;
 		case "extrair":
-			pontos_extrair = nj.concatenate(pontos_extrair.T,mouse).T;
+			if(pontos_de_fuga.shape[0]==0){
+				alert("Primeiro se necessita do cálculo da câmera!");
+			}else{
+				switch (pontos_extrair.shape[0]){
+					case 0:
+						pontos_extrair = nj.concatenate(pontos_extrair.T,mouse).T;
+						update();
+						break;
+					case 1:
+						pontos_extrair = nj.concatenate(pontos_extrair.T,mouse).T;
+						extract_texture();
+						update();
+						break;
+					default:
+						pontos_extrair = mouse.reshape(-1,2);
+						update();
+				}
+			}				
 			break;
 		default:
 			//pass

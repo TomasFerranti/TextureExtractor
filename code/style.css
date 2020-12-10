@@ -21,8 +21,10 @@ body {
 }
 
 button {
-    width: 16.35%;
+    width: 16.25%;
     height: 100%;
+    margin-left: auto;
+    margin-right: auto;
     background: lightgray;
     cursor: pointer;
 }
@@ -45,7 +47,18 @@ canvas {
 
 #textura_div{
     position: relative;
-    height: auto;
+    height: 500px;
     margin: 0 auto;
     border: 1px solid black;
+}
+
+#sub_textura{
+    width: 49.8%;
+    height: 100%;
+    float: left;
+    border: 1px solid black;
+}
+
+p {
+    text-align: center;
 }
