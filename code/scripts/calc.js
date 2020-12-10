@@ -43,7 +43,7 @@ function calc(){
                     ((Fx.get(0,0) - CO.get(0,0))**2 + (Fx.get(0,1) - CO.get(0,1))**2) -
                     ((Fy.get(0,0) - CO.get(0,0))**2 + (Fy.get(0,1) - CO.get(0,1))**2);
 
-        C = nj.array([CO.get(0,0), CO.get(0,1), (z2/2)**(1/2)]).reshape(-1,3);        
+        C = nj.array([CO.get(0,0), CO.get(0,1), -1*(z2/2)**(1/2)]).reshape(-1,3);        
 
         // base XYZ        
         var Fx = add_hom(pontos_de_fuga.slice([0,1]));
@@ -62,7 +62,6 @@ var v = [];
 var P = [];
 function extract_texture(){
     v = [pontos_extrair.slice([0,1]), 0, pontos_extrair.slice([1,2]), 0];
-    print_array(v[0]);
     P = [unProject(v[0],"Y"), 0, unProject(v[2],"Y"), 0];
     P[1] = nj.array([P[2].get(0,0),1,P[0].get(0,2)]).reshape(1,3);
     P[3] = nj.array([P[0].get(0,0),1,P[2].get(0,1)]).reshape(1,3);

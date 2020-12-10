@@ -40,6 +40,6 @@ function update(){
         for (var i = 0; i < pontos_extrair.shape[0]; i++) {
             line(pontos_extrair.slice([2*i,2*i+1]),pontos_extrair.slice([2*i+1,2*i+2]),"yellow");
         }
-        line(pontos_extrair.slice([0,1]),pontos_extrair.slice([pontos_extrair.shape[0],pontos_extrair.shape[0]+1]),lineColor[j]);
+        line(pontos_extrair.slice([0,1]),pontos_extrair.slice([pontos_extrair.shape[0]-1,pontos_extrair.shape[0]]),lineColor[j]);
     }
 }

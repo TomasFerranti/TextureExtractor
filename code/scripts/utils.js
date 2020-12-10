@@ -70,17 +70,17 @@ function rem_hom(vector){
 function unProject(vector,plano) {
     switch(plano){
         case "X":
-
+            
             break;
         case "Y":
             var Q = add_hom(vector).subtract(C);
-            Q.set(0,2,-C.get(0,2));
             Q = nj.dot(base_XYZ.T,Q.reshape(3,1)).reshape(1,3);
             Q = Q.multiply(1/Q.get(0,1));
+            print_array(Q);
             Q.set(0,1,1);
             break;
         case "Z":
-
+            
             break;
         default:
             // pass
