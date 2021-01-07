@@ -64,9 +64,48 @@ function extract_texture(){
     v = [pontos_extrair.slice([0,1]), 0, pontos_extrair.slice([1,2]), 0];
     P = [unProject(v[0],"Y"), 0, unProject(v[2],"Y"), 0];
     P[1] = nj.array([P[2].get(0,0),1,P[0].get(0,2)]).reshape(1,3);
-    P[3] = nj.array([P[0].get(0,0),1,P[2].get(0,1)]).reshape(1,3);
-    v[1] = rem_hom(project(P[1]));
-    v[3] = rem_hom(project(P[3]));
+    P[3] = nj.array([P[0].get(0,0),1,P[2].get(0,2)]).reshape(1,3);
+    v[1] = project(P[1]);
+    v[3] = project(P[3]);
+
+    var dx = ( norm(v[0].subtract(v[1])) + norm(v[2].subtract(v[3])) )/2;
+    var dy = ( norm(v[0].subtract(v[3])) + norm(v[1].subtract(v[2])) )/2;
+    var Dx = norm(P[0].subtract(P[1]));
+    var Dy = norm(P[1].subtract(P[2]));
+    var a = Dy/Dx;
+    if (dy/dx > a) {
+      var w = round(dx,0);
+      var h = round(dx*a,0); 
+    }
+    else {
+      var h = round(dy,0);
+      var w = round(h/a,0);   
+    }
+    console.log("Largura: "); 
+    console.log(w);
+    console.log("Altura: "); 
+    console.log(h);
+
+    var texCanvas = document.getElementById("textura_canvas");
+    var texCtx = texCanvas.getContext("2d");
+
+    var curpix, pixproj, pixrgb;
+    Dx = P[1].get(0,0) - P[0].get(0,0);
+    Dy = P[3].get(0,2) - P[0].get(0,2);
+    imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
+	imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
+                                0, 0, imgCanvas.width, imgCanvas.height);
+                                
+    texCtx.clearRect(0, 0, texCanvas.width, texCanvas.height);
+    for (var i = 0; i < w; i++) {
+      for (var j = 0; j < h; j++) {
+        curpix = nj.array([P[0].get(0,0) + Dx*i/w, 1, P[0].get(0,2)+Dy*j/h]).reshape(1,3);
+        pixproj = project(curpix);
+        pixrgb = imgCtx.getImageData(round(pixproj.get(0,0),0),round(pixproj.get(0,1),0),1,1).data;
+        texCtx.fillStyle = "rgba("+pixrgb[0]+","+pixrgb[1]+","+pixrgb[2]+","+(pixrgb[3]/255)+")";
+        texCtx.fillRect( i, j, 1, 1);
+      }
+    }
 
     // atualizar pontos_extrair para desenhar
     pontos_extrair = nj.concatenate(v).reshape(-1,2);

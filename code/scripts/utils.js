@@ -55,8 +55,12 @@ function clear_all(){
     clear_camera();
 }
 
+function norm(vector){
+    return( nj.sum(vector.pow(2))**(1/2));
+}
+
 function normalize(vector){
-    return(vector.multiply(1/nj.sum(vector.pow(2))**(1/2)));
+    return(vector.multiply(1/norm(vector)));
 }
 
 function add_hom(vector){
@@ -68,19 +72,17 @@ function rem_hom(vector){
 }
 
 function unProject(vector,plano) {
+    var Q = add_hom(vector).subtract(C);
+    Q = nj.dot(base_XYZ.T,Q.reshape(3,1)).reshape(1,3);
     switch(plano){
         case "X":
-            
+            Q = Q.multiply(1/Q.get(0,0));
             break;
         case "Y":
-            var Q = add_hom(vector).subtract(C);
-            Q = nj.dot(base_XYZ.T,Q.reshape(3,1)).reshape(1,3);
             Q = Q.multiply(1/Q.get(0,1));
-            print_array(Q);
-            Q.set(0,1,1);
             break;
         case "Z":
-            
+            Q = Q.multiply(1/Q.get(0,2));
             break;
         default:
             // pass
@@ -91,6 +93,6 @@ function unProject(vector,plano) {
 function project(vector){
     var Q = nj.dot(base_XYZ,vector.reshape(3,1)).reshape(1,3);
     Q = Q.multiply(-C.get(0,2)/Q.get(0,2)).add(C);
-    Q.set(0,2,0);
+    Q = rem_hom(Q);
     return(Q); 
 }
