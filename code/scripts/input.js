@@ -16,14 +16,14 @@ imgImagem.onload = function(){
 
 // BUTTOM INPUT
 
-document.getElementById("bt_carregar").addEventListener("click", function () {
+function carregarImagem() {
 	x = prompt("Por favor insira a URL da imagem desejada.");
 	imgImagem.src = x;
 	clear_all();
 	update();
-});
+};
 
-document.getElementById("bt_calcular").addEventListener("click", function () {
+function calcularCam() {
 	calc();
 	update();
 	// tirar versão final
@@ -32,26 +32,25 @@ document.getElementById("bt_calcular").addEventListener("click", function () {
 	point(pontos_de_fuga.get(2,0),pontos_de_fuga.get(2,1),10,"blue");
 	point(C.get(0,0),C.get(0,1),10,"pink");
 	// até aqui
-});
+};
 
 lastButton = "";
-document.getElementById("bt_guiaX").addEventListener("click", function () {
+function guiaX() {
 	lastButton = "X";
 	update();
-});
-document.getElementById("bt_guiaY").addEventListener("click", function () {
+};
+function guiaY() {
 	lastButton = "Y";
 	update();
-});
-document.getElementById("bt_guiaZ").addEventListener("click", function () {
+};
+function guiaZ() {
 	lastButton = "Z";
 	update();
-});
-document.getElementById("bt_extrair").addEventListener("click", function () {
+};
+function extrairText() {
 	lastButton = "extrair";
 	update();
-});
-
+};
 
 // POINT INPUT
 

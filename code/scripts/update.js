@@ -1,9 +1,8 @@
 function update(){
-    // button
-    document.getElementById("bt_guiaX").style.background=getColor(lastButton == "X");
-    document.getElementById("bt_guiaY").style.background=getColor(lastButton == "Y");
-    document.getElementById("bt_guiaZ").style.background=getColor(lastButton == "Z");        
-    document.getElementById("bt_extrair").style.background=getColor(lastButton == "extrair");      
+    document.getElementById("bt_guiaX").innerHTML=("Eixo X" + getText(lastButton == "X"));
+    document.getElementById("bt_guiaY").innerHTML=("Eixo Y" + getText(lastButton == "Y"));
+    document.getElementById("bt_guiaZ").innerHTML=("Eixo Z" + getText(lastButton == "Z"));        
+    document.getElementById("bt_extrair").innerHTML=("Extrair" + getText(lastButton == "extrair"));      
 
     // image
     imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);

@@ -13,12 +13,22 @@
 <body>
     <div id="universo">
         <div id="controles">
-            <button id = "bt_carregar">Carregar Imagem</button>
-            <button id = "bt_guiaX">Eixo X</button>
-            <button id = "bt_guiaY">Eixo Y</button>
-            <button id = "bt_guiaZ">Eixo Z</button>
-            <button id = "bt_calcular">Calcular</button>
-            <button id = "bt_extrair">Extrair</button>
+            <div class="dropdown">
+                <button class="dropbtn">Arquivo</button>
+                <div class="dropdown-content">
+                  <a href="javascript:carregarImagem()">Carregar Imagem</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Calibração</button>
+                <div class="dropdown-content">
+                  <a id="bt_guiaX" href="javascript:guiaX()">Eixo X</a>
+                  <a id="bt_guiaY" href="javascript:guiaY()">Eixo Y</a>
+                  <a id="bt_guiaZ" href="javascript:guiaZ()">Eixo Z</a>
+                  <a href="javascript:calcularCam()">Calcular</a>
+                  <a id="bt_extrair" href="javascript:extrairText()">Extrair</a>
+                </div>
+            </div>
         </div>
 
         <div id="imagem_div">
@@ -30,7 +40,7 @@
                 <canvas id = "textura_canvas" height="400" width="400"></canvas>
             </div>
             <div id="sub_textura">
-                <p id ="output"> Realize o cálculo da câmera pra <br/> as variáveis aparecerem aqui. </p>
+                <p id ="output"> Realize o cálculo da câmera para <br/> as variáveis aparecerem aqui. </p>
             </div>
         </div>
     </div>

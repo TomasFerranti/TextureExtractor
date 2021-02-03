@@ -81,10 +81,13 @@ function extract_texture(){
       var h = round(dy,0);
       var w = round(h/a,0);   
     }
+   
+    /*
     console.log("Largura: "); 
     console.log(w);
     console.log("Altura: "); 
     console.log(h);
+    */
 
     var texCanvas = document.getElementById("textura_canvas");
     var texCtx = texCanvas.getContext("2d");

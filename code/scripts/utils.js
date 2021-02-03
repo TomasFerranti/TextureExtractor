@@ -1,11 +1,23 @@
-function getColor(text) {
-    return (text ? "darkgrey" : "lightgrey");
+// HTML stuff
+function getText(text) {
+    return (text ? " ✓" : "");
 }
 
-function round(x,n){
-    return (Math.round((10**n)*x)/(10**n));
+// JS variable stuff
+function clear_camera(){
+    pontos_de_fuga = nj.array([]).reshape(-1,2);
+    C = nj.array([]).reshape(-1,3);  
+    base_XYZ = nj.zeros([3,3]);
+    pontos_extrair = nj.array([]).reshape(-1,2);
+    document.getElementById('output').innerHTML = "Realize o cálculo da câmera para <br/> as variáveis aparecerem aqui.";
 }
 
+function clear_all(){
+    pontos_guia = [nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2)];
+    clear_camera();
+}
+
+// Drawing stuff
 function line(A,B,cor){
 	imgCtx.strokeStyle = cor;
 	imgCtx.lineWidth = 3;
@@ -21,6 +33,11 @@ function point(cx,cy,raio,cor){
 	imgCtx.fillStyle = cor;
 	imgCtx.fill();
 };
+
+// Math stuff
+function round(x,n){
+    return (Math.round((10**n)*x)/(10**n));
+}
 
 function triangle_area(p,q,r){
     return(p.get(0,0) * q.get(0,1) + q.get(0,0) * r.get(0,1) + 
@@ -40,19 +57,6 @@ function proj(Va, Vb, q){
     var v = Vb.get(0,0)*Vb.get(0,0) + Vb.get(0,1)*Vb.get(0,1);
     var P = Vb.multiply(c/v);
     return (P.add(q));
-}
-
-function clear_camera(){
-    pontos_de_fuga = nj.array([]).reshape(-1,2);
-    C = nj.array([]).reshape(-1,3);  
-    base_XYZ = nj.zeros([3,3]);
-    pontos_extrair = nj.array([]).reshape(-1,2);
-    document.getElementById('output').innerHTML = "Realize o cálculo da câmera para <br/> as variáveis aparecerem aqui.";
-}
-
-function clear_all(){
-    pontos_guia = [nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2)];
-    clear_camera();
 }
 
 function norm(vector){
