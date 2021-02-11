@@ -1,0 +1,59 @@
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <title> Projeto ImagineRio </title>
+
+    <link rel="stylesheet" href="code/style.css">
+</head>
+
+<body>
+    <div id="universo">
+        <div id="controles">
+            <div class="dropdown">
+                <button class="dropbtn">Arquivo</button>
+                <div class="dropdown-content">
+                  <a href="javascript:carregarImagemWeb()">Carregar Imagem (web)</a>
+                  <a href="javascript:carregarImagemLocal()">Carregar Imagem (local)</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Calibração</button>
+                <div class="dropdown-content">
+                  <a id="bt_guiaX" href="javascript:guiaX()">Eixo X</a>
+                  <a id="bt_guiaY" href="javascript:guiaY()">Eixo Y</a>
+                  <a id="bt_guiaZ" href="javascript:guiaZ()">Eixo Z</a>
+                  <a href="javascript:calcularCam()">Calcular</a>
+                  <a id="bt_extrair" href="javascript:extrairText()">Extrair</a>
+                  <a href="javascript:salvarJson()">Salvar Calibração (.json)</a>
+                  <a href="javascript:carregarJson()">Carregar Calibração (.json)</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="imagem_div">
+            <canvas id = "imagem_canvas" height="800" width="1200"></canvas>        
+        </div>
+
+        <div id="textura_div">
+            <div id="sub_textura">
+                <canvas id = "textura_canvas" height="400" width="400"></canvas>
+            </div>
+            <div id="sub_textura">
+                <p id ="output"> Realize o cálculo da câmera para <br/> as variáveis aparecerem aqui. </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js"></script>
+    <script type="text/javascript" src="code/scripts/input.js"></script>
+    <script type="text/javascript" src="code/scripts/utils.js"></script>
+    <script type="text/javascript" src="code/scripts/update.js"></script>
+    <script type="text/javascript" src="code/scripts/calc.js"></script>
+    <script type="text/javascript" src="code/scripts/print.js"></script>
+    <script type="text/javascript" src="code/scripts/server.js"></script>
+</body>
+</html>
