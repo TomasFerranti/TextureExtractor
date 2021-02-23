@@ -1,3 +1,9 @@
+// Este script é responsável por fazer conexões com o servidor criado pelo node.js
+
+// -----------------------
+// ARQUIVOS .JSON
+
+// Salvar calibração
 function salvarJson() {
     var filename = prompt("Digite o nome do arquivo:");
     if (filename == ""){
@@ -6,16 +12,16 @@ function salvarJson() {
     }
     filename += ".json";
 
-    if (arrays_equal(base_XYZ,nj.zeros([3,3]))){
+    if (arr_igual(baseXYZ,nj.zeros([3,3]))){
         alert("Calibre a câmera antes de salvar!");
         return;
     }
     
-    var data = {"base":base_XYZ.toJSON(),
+    var data = {"base":baseXYZ.toJSON(),
                 "camera":C.toJSON()};
     data = JSON.stringify(data);
     // save
-    saveFile(filename, data, function(err) {
+    salvarArquivo(filename, data, function(err) {
         if (err) {
             alert("failed to save: " + filename + "\n" + err);
         } else {
@@ -25,8 +31,9 @@ function salvarJson() {
     
 }
 
+// Carregar calibração
 function carregarJson(){
-    // get the filename
+    // Pegar o nome do arquivo
     var filename = prompt("Digite o nome do arquivo .json:");
     if (filename == ""){
         alert("Coloque um nome não vazio!");
@@ -34,44 +41,55 @@ function carregarJson(){
     }
     filename += ".json";
 
-    // load 
-    loadFile(filename, function(err, data) {
+    // Carregá-lo
+    carregarArquivo(filename, function(err, data) {
         if (err) {
             alert("failed to load: " + filename + "\n" + err);
         } else {
+            limparTodasVar();
             data = JSON.parse(data);
-            base_XYZ = nj.array(JSON.parse(data.base));
+            baseXYZ = nj.array(JSON.parse(data.base));
             C = nj.array(JSON.parse(data.camera));
-            print_results();
-            update();
+            statusCalibracao = "carregada";
+            mostrarResultados();
+            attElementosHTML();
             alert("loaded: " + filename);
         }
     });
-
 };
+// -----------------------
 
+
+// -----------------------
+// CARREGAMENTO DE ARQUIVOS
+
+// Carregar imagem local do usuário
 function carregarImagemLocal(){
+    // Pegar o nome do arquivo
     var filename = prompt("Digite o nome do arquivo (completo):");
     if (filename == ""){
         alert("Coloque um nome não vazio!");
         return;
     };
 
-    // load 
+    // Carregá-lo
     imgImagem.src = filename;  
-    clear_all();
-	update();
+    limparTodasVar();
+	attElementosHTML();
 }
 
-function saveFile(filename, data, callback) {
-    doXhr(filename, 'PUT', data, callback);
-}
- 
-function loadFile(filename, callback) {
-    doXhr(filename, 'GET', '', callback);
+// Protocolo de salvar
+function salvarArquivo(filename, data, callback) {
+    requestXml(filename, 'PUT', data, callback);
 }
 
-function doXhr(url, method, data, callback) {
+// Protocolo de carregar
+function carregarArquivo(filename, callback) {
+    requestXml(filename, 'GET', '', callback);
+}
+
+// Lidar com os requests
+function requestXml(url, method, data, callback) {
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);
     xhr.onload = function() {
@@ -82,4 +100,5 @@ function doXhr(url, method, data, callback) {
         }
     };
     xhr.send(data);
-  }
+}
+// -----------------------

@@ -1,11 +1,17 @@
-// IMAGE INPUT
+// Este script é responsável por todo tipo de entrada do usuário no HTML
 
-var imgCanvas = document.getElementById("imagem_canvas");
+// -----------------------
+// CARREGAMENTO DE IMAGENS
+
+var imgCanvas = document.getElementById("imagemCanvas");
 var imgCtx = imgCanvas.getContext("2d");
 
+var statusCalibracao = "naoCalculada";
 var imgImagem = new Image();
 imgImagem.crossOrigin = "";
-imgImagem.src = "https://raw.githubusercontent.com/TomasFerranti/ImagineRio/main/code/sample_images/imagem_atilio.png";
+
+// Imagem padrão
+imgImagem.src = "https://raw.githubusercontent.com/TomasFerranti/ImagineRio/main/public/imagem.png";
 
 imgImagem.onload = function(){
 	imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
@@ -13,91 +19,81 @@ imgImagem.onload = function(){
 								0, 0, imgCanvas.width, imgCanvas.height); 
 };
 
+// -----------------------
 
-// BUTTOM INPUT
+
+// -----------------------
+// ENTRADA DE BOTÕES
 
 function carregarImagemWeb() {
 	x = prompt("Por favor insira a URL da imagem desejada.");
 	imgImagem.src = x;
-	clear_all();
-	update();
+	limparTodasVar();
+	attElementosHTML();
 };
 
 function calcularCam() {
 	calc();
-	update();
-	// tirar versão final
-	point(pontos_de_fuga.get(0,0),pontos_de_fuga.get(0,1),10,"red");
-	point(pontos_de_fuga.get(1,0),pontos_de_fuga.get(1,1),10,"green");
-	point(pontos_de_fuga.get(2,0),pontos_de_fuga.get(2,1),10,"blue");
-	point(C.get(0,0),C.get(0,1),10,"pink");
-	// até aqui
+	attElementosHTML();
 };
 
-lastButton = "";
+var lastButton = "";
 function guiaX() {
 	lastButton = "X";
-	update();
+	attElementosHTML();
 };
 function guiaY() {
 	lastButton = "Y";
-	update();
+	attElementosHTML();
 };
 function guiaZ() {
 	lastButton = "Z";
-	update();
+	attElementosHTML();
 };
-function extrairText() {
+function botaoExtrairTextura() {
 	lastButton = "extrair";
-	update();
+	attElementosHTML();
 };
+// -----------------------
 
-// POINT INPUT
 
-// X, Y e Z
-var pontos_guia = [nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2)];
-// Extrair
-var pontos_extrair = nj.array([]).reshape(-1,2);
+// -----------------------
+// ENTRADA DOS PONTOS CALIBRAÇÃO / EXTRAÇÃO
+
+// Declarando variáveis globais: pontos guias da calibração e pontos de extração
+var pontosGuia = [nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2)];
+var pontosExtrair = nj.array([]).reshape(-1,2);
 
 // Clicou no canvas
 imgCanvas.addEventListener("click", function (e) {
+	// Limpar câmera caso esteja calibrando com uma calibração já existente
+	if ((lastButton == "X" || lastButton == "Y" || lastButton == "Z") && (statusCalibracao == "calculada" || statusCalibracao == "carregada")){
+		limparTodasVar();
+	}
+
+	// Posição do mouse
 	var rect = imgCanvas.getBoundingClientRect();
 	var mouse = nj.array([e.pageX-rect.x-window.pageXOffset,e.pageY-rect.y-window.pageYOffset]).reshape(2,-1);
+
+	// Último botão clicado
 	switch (lastButton){
 		case "X":
-			pontos_guia[0] = nj.concatenate(pontos_guia[0].T,mouse).T;
-			clear_camera();
+			pontosGuia[0] = nj.concatenate(pontosGuia[0].T,mouse).T;
 			break;
 		case "Y":
-			pontos_guia[1] = nj.concatenate(pontos_guia[1].T,mouse).T;
-			clear_camera();
+			pontosGuia[1] = nj.concatenate(pontosGuia[1].T,mouse).T;
 			break;
 		case "Z":
-			pontos_guia[2] = nj.concatenate(pontos_guia[2].T,mouse).T;
-			clear_camera();
+			pontosGuia[2] = nj.concatenate(pontosGuia[2].T,mouse).T;
 			break;
 		case "extrair":
-			if(arrays_equal(base_XYZ, nj.zeros([3,3]))){
-				alert("Primeiro se necessita do cálculo da câmera!");
-			}else{
-				switch (pontos_extrair.shape[0]){
-					case 0:
-						pontos_extrair = nj.concatenate(pontos_extrair.T,mouse).T;
-						update();
-						break;
-					case 1:
-						pontos_extrair = nj.concatenate(pontos_extrair.T,mouse).T;
-						extract_texture();
-						update();
-						break;
-					default:
-						pontos_extrair = mouse.reshape(-1,2);
-						update();
-				}
-			}				
+			extrairTextura(mouse);							
 			break;
 		default:
-			//pass
+			// Pass
 	}
-	update();
+
+	// Atualizar a tela
+	attElementosHTML();
 });
+// -----------------------

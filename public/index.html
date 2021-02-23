@@ -14,35 +14,35 @@
     <div id="universo">
         <div id="controles">
             <div class="dropdown">
-                <button class="dropbtn">Arquivo</button>
-                <div class="dropdown-content">
+                <button class="dropdown-bt">Arquivo</button>
+                <div class="dropdown-conteudo">
                   <a href="javascript:carregarImagemWeb()">Carregar Imagem (web)</a>
                   <a href="javascript:carregarImagemLocal()">Carregar Imagem (local)</a>
                 </div>
             </div>
             <div class="dropdown">
-                <button class="dropbtn">Calibração</button>
-                <div class="dropdown-content">
-                  <a id="bt_guiaX" href="javascript:guiaX()">Eixo X</a>
-                  <a id="bt_guiaY" href="javascript:guiaY()">Eixo Y</a>
-                  <a id="bt_guiaZ" href="javascript:guiaZ()">Eixo Z</a>
+                <button class="dropdown-bt">Calibração</button>
+                <div class="dropdown-conteudo">
+                  <a id="btGuiaX" href="javascript:guiaX()">Eixo X</a>
+                  <a id="btGuiaY" href="javascript:guiaY()">Eixo Y</a>
+                  <a id="btGuiaZ" href="javascript:guiaZ()">Eixo Z</a>
                   <a href="javascript:calcularCam()">Calcular</a>
-                  <a id="bt_extrair" href="javascript:extrairText()">Extrair</a>
+                  <a id="btExtrair" href="javascript:botaoExtrairTextura()">Extrair</a>
                   <a href="javascript:salvarJson()">Salvar Calibração (.json)</a>
                   <a href="javascript:carregarJson()">Carregar Calibração (.json)</a>
                 </div>
             </div>
         </div>
 
-        <div id="imagem_div">
-            <canvas id = "imagem_canvas" height="800" width="1200"></canvas>        
+        <div id="imagemDiv">
+            <canvas id = "imagemCanvas" height="800" width="1200"></canvas>        
         </div>
 
-        <div id="textura_div">
-            <div id="sub_textura">
-                <canvas id = "textura_canvas" height="400" width="400"></canvas>
+        <div id="texturaDiv">
+            <div id="subTextura">
+                <canvas id = "texturaCanvas" height="400" width="400"></canvas>
             </div>
-            <div id="sub_textura">
+            <div id="subTextura">
                 <p id ="output"> Realize o cálculo da câmera para <br/> as variáveis aparecerem aqui. </p>
             </div>
         </div>
