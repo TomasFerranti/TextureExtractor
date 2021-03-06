@@ -40,4 +40,4 @@ caso você se encontre na pasta do projeto. Caso não, você pode navegar até e
 
     cd "C:\DiretorioDaPasta"
 
-pelo sistema de arquivos do Windows. Com isso, deve-se aparecer uma mensagem no prompt escrita "listening at http://localhost:8000". Este é o link do servidor local onde o projeto está hospedado.
+pelo sistema de arquivos do Windows. Com isso, deve-se aparecer uma mensagem no prompt escrita "listening at http://localhost:8000". Este é o link do servidor local onde o projeto está hospedado. Caso você atualize algum arquivo, para reiniciar o servidor basta cancelar o atual usando CTRL+C e executar o Node novamente.
