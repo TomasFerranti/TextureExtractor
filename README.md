@@ -26,7 +26,7 @@ Com isso, esse arquivo e essa pasta devem se encontrar dentro do diretório "pub
 
 Após os passos acima serem seguidos, você deve possuir a pasta packages semelhante a isso:
 
-<img src="markdown_images/package_files.png">
+<img src="markdown_images/packages_files.png">
 
 Com isso, basta agora executar o Node.
 
