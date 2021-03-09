@@ -5,11 +5,17 @@
 
 // Quando ela é chamada, atualiza todos os elementos do HTML
 function attElementosHTML(){
+    // Botões guia calibração
     var textoCorreto = (texto) => (texto ? ' ✓' : '');
     document.getElementById('btGuiaX').innerHTML=('Eixo X' + textoCorreto(lastButton == 'X'));
     document.getElementById('btGuiaY').innerHTML=('Eixo Y' + textoCorreto(lastButton == 'Y'));
     document.getElementById('btGuiaZ').innerHTML=('Eixo Z' + textoCorreto(lastButton == 'Z'));        
     document.getElementById('btExtrair').innerHTML=('Extrair' + textoCorreto(lastButton == 'extrair'));      
+
+    // Botões textura
+    document.getElementById('btPlanoYZ').innerHTML=('Plano YZ' + textoCorreto(lastButtonTex == 'YZ'));
+    document.getElementById('btPlanoXZ').innerHTML=('Plano XZ' + textoCorreto(lastButtonTex == 'XZ'));
+    document.getElementById('btPlanoXY').innerHTML=('Plano XY' + textoCorreto(lastButtonTex == 'XY'));
 
     // Imagem
     imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
@@ -35,18 +41,19 @@ function attElementosHTML(){
     }
 
     // Pontos da textura
-    if(pontosExtrair.shape[0]<3){
-        for (var i = 0; i < pontosExtrair.shape[0]; i++) {
-            ponto(pontosExtrair.get(i,0), pontosExtrair.get(i,1), 5,'orange');
+    for (var i = 0; i < pontosExtrair.length; i++) {
+        ponto(pontosExtrair[i].get(0,0), pontosExtrair[i].get(0,1), 5,'orange');
+    }
+    
+    // Planos
+    for (var j = 0; j < planos.length; j++) {
+        for (var i = 0; i < 4; i++) {
+            ponto(planos[j].v[i].get(0,0), planos[j].v[i].get(0,1), 3,'orange');
         }
-    }else{
-        for (var i = 0; i < pontosExtrair.shape[0]; i++) {
-            ponto(pontosExtrair.get(i,0), pontosExtrair.get(i,1), 5,'orange');
+        for (var i = 0; i < 3; i++) {
+            reta(planos[j].v[i],planos[j].v[i+1],'yellow');
         }
-        for (var i = 0; i < pontosExtrair.shape[0]-1; i++) {
-            reta(pontosExtrair.slice([i,i+1]),pontosExtrair.slice([i+1,i+2]),'yellow');
-        }
-        reta(pontosExtrair.slice([0,1]),pontosExtrair.slice([pontosExtrair.shape[0]-1,pontosExtrair.shape[0]]),'yellow');
+        reta(planos[j].v[3],planos[j].v[0],'yellow');
     }
 
     // Ortocentro

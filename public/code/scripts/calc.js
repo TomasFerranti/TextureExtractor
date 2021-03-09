@@ -81,9 +81,122 @@ function calc(){
 // -----------------------
 // EXTRAÇÃO DA TEXTURA
 
+var auxDic = {'YZ':0,'XZ':1,'XY':2};
+// Classe criada para representar os planos
+class Plano {
+    // v são os pontos do canvas 2D e P os pontos no espaço 3D
+    // O array P possui três pontos inicialmente: dois de orientação do plano anterior e um para extensão
+    constructor(v,P,planoParalelo) {
+        this.v = criarCopia(v);
+        this.P = criarCopia(P);
+        this.planoParelelo = planoParalelo;
+        this.obterPontos();
+    }
+
+    obterPontos(){
+        var v = this.v;
+        var P = this.P;
+        // Ponto de orientação
+        var auxPoint = desprojetarTela(this.v[2].clone(),
+                                       this.planoParelelo,
+                                       this.P[0].get(0,auxDic[this.planoParelelo]));
+        // Posição dos outros dois pontos dependendo do plano paralelo
+        switch (this.planoParelelo){
+            case 'XY':
+                P[2] = nj.array([auxPoint.get(0,0),P[0].get(0,1),P[0].get(0,2)]).reshape(1,3);
+                P[3] = nj.array([auxPoint.get(0,0),P[1].get(0,1),P[0].get(0,2)]).reshape(1,3);
+                break;
+            case 'XZ':
+                P[2] = nj.array([auxPoint.get(0,0),P[0].get(0,1),P[1].get(0,2)]).reshape(1,3);
+                P[3] = nj.array([auxPoint.get(0,0),P[0].get(0,1),P[0].get(0,2)]).reshape(1,3);
+                break;
+            case 'YZ':
+                P[2] = nj.array([P[0].get(0,0),auxPoint.get(0,1),P[1].get(0,2)]).reshape(1,3);
+                P[3] = nj.array([P[0].get(0,0),auxPoint.get(0,1),P[0].get(0,2)]).reshape(1,3);
+                break;
+            default:
+        }
+        // A posição deles na tela
+        v[2] = projetarTela(P[2]);
+        v[3] = projetarTela(P[3]);
+
+        // Extrair a textura
+        this.obterTextura();
+    }
+
+    obterTextura(){
+        var v = this.v;
+        var P = this.P;
+
+        // Heurística de aspect ratio
+        var dx = ( norma(v[0].subtract(v[1])) + norma(v[2].subtract(v[3])) )/2;
+        var dy = ( norma(v[0].subtract(v[3])) + norma(v[1].subtract(v[2])) )/2;
+        var Dx = norma(P[0].subtract(P[1]));
+        var Dy = norma(P[1].subtract(P[2]));
+        var a = Dy/Dx;
+        if (dy/dx > a) {
+            var w = arredondar(dx,0);
+            var h = arredondar(dx*a,0); 
+        }
+        else {
+            var h = arredondar(dy,0);
+            var w = arredondar(h/a,0);   
+        }            
+
+        var curpix, pixproj, pixrgb, pos, curdt;
+        var dt = P[2].subtract(P[0]);
+
+        // Criar o buffer da imagem que irá receber os dados dos pixels. Variável in place
+        var imgData = criarImagem(w,h);
+        var buffer = imgData.data;
+
+        // Preenchendo os dados da imagem para depois desenhar
+        for (var i = 0; i < h; i++) {
+            for (var j = 0; j < w; j++) {
+                // A direção para onde os pixels andam depende do plano
+                switch(this.planoParelelo){
+                    case 'XY':
+                        curdt = nj.array([dt.get(0,0)*j/w,
+                                          dt.get(0,1)*i/h, 
+                                          dt.get(0,2)]).reshape(1,3);                
+                        break;
+                    case 'YZ':
+                        curdt = nj.array([dt.get(0,0),
+                                          dt.get(0,1)*i/h, 
+                                          dt.get(0,2)*j/w]).reshape(1,3);   
+                        break;
+                    case 'XZ':
+                        curdt = nj.array([dt.get(0,0)*i/h,
+                                          dt.get(0,1), 
+                                          dt.get(0,2)*j/w]).reshape(1,3);   
+                        break;
+                }
+                curpix = P[0].add(curdt);
+                pixproj = projetarTela(curpix);
+                pixrgb = imgCtxSec.getImageData(arredondar(pixproj.get(0,0),0),
+                                            arredondar(pixproj.get(0,1),0),1,1).data;
+                pos = 4*(i*w + j);
+                buffer[pos] = pixrgb[0];
+                buffer[pos+1] = pixrgb[1];
+                buffer[pos+2] = pixrgb[2];
+                buffer[pos+3] = pixrgb[3];
+            }
+        }
+
+        // Adiciona a textura como atributo da classe
+        this.textura = imgData;
+    }
+}
+
+// Canvas secreto com a imagem original desenhada
+var imgCanvasSec = document.createElement('canvas');
+var imgCtxSec = imgCanvasSec.getContext('2d');
+imgCanvasSec.width = imgCanvas.width;
+imgCanvasSec.height = imgCanvas.height;
+
 // Variáveis globais do canvas da textura
-var texCanvas = document.getElementById('texturaCanvas');
-var v, P;
+var planos = [];
+var ultimaProf = 1;
 // Função chamada quando se clica no canvas com extrair selecionado
 function extrairTextura(mouse){
     // Caso não tenha o cálculo da câmera
@@ -93,77 +206,38 @@ function extrairTextura(mouse){
     }
 
     // Para cada quantidade de pontos já selecionada
-    switch (pontosExtrair.shape[0]){
-        case 0:
-            pontosExtrair = nj.concatenate(pontosExtrair.T,mouse).T;
-            break;
-        case 4:
-            pontosExtrair = mouse.reshape(-1,2);
+    switch (pontosExtrair.length){
+        case 0: case 1:
+            if(planos.length==0){
+                pontosExtrair.push(mouse);
+            }else{
+                var pontosSeg = segmentoMaisProximo(mouse);
+                pontosExtrair.push(pontosSeg[0]);
+                pontosExtrair.push(pontosSeg[1]);
+                ultimaProf = pontosSeg[2];
+            }
             break;
         default:
-            // Caso se tenha dois pontos para extração
             // Adiciona o novo ponto
-            pontosExtrair = nj.concatenate(pontosExtrair.T,mouse).T;
-
-            // v é o array com as coordenadas dos pontos na tela
-            // P é o array com as coordenadas dos pontos no espaço
-            v = [pontosExtrair.slice([0,1]), 0, pontosExtrair.slice([1,2]), 0];
-            P = [desprojetarTela(v[0],'Y'), 0, desprojetarTela(v[2],'Y'), 0];
-            P[1] = nj.array([P[2].get(0,0),1,P[0].get(0,2)]).reshape(1,3);
-            P[3] = nj.array([P[0].get(0,0),1,P[2].get(0,2)]).reshape(1,3);
-            v[1] = projetarTela(P[1]);
-            v[3] = projetarTela(P[3]);
-
-            // Heurística de aspect ratio para a textura
-            var dx = ( norma(v[0].subtract(v[1])) + norma(v[2].subtract(v[3])) )/2;
-            var dy = ( norma(v[0].subtract(v[3])) + norma(v[1].subtract(v[2])) )/2;
-            var Dx = norma(P[0].subtract(P[1]));
-            var Dy = norma(P[1].subtract(P[2]));
-            var a = Dy/Dx;
-            if (dy/dx > a) {
-                var w = arredondar(dx,0);
-                var h = arredondar(dx*a,0); 
-            }
-            else {
-                var h = arredondar(dy,0);
-                var w = arredondar(h/a,0);   
-            }            
-
-            var curpix, pixproj, pixrgb, pos;
-            Dx = P[1].get(0,0) - P[0].get(0,0);
-            Dy = P[3].get(0,2) - P[0].get(0,2);
-            imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
-            imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-                                        0, 0, imgCanvas.width, imgCanvas.height);
-
-            // Criar o elemento escondido da imagem da textura a ser preenchida
-            var canvas_escondido = document.createElement('canvas');
-            var contexto_escondido = canvas_escondido.getContext('2d');
-            canvas_escondido.width = texCanvas.width;
-            canvas_escondido.height = texCanvas.height;
-            var imgData = contexto_escondido.createImageData(w,h);
-            var buffer = imgData.data;
+            pontosExtrair.push(mouse);
             
-            // Preenchendo os dados da imagem para depois desenhar
-            for (var i = 0; i < h; i++) {
-                for (var j = 0; j < w; j++) {
-                    curpix = nj.array([P[0].get(0,0) + Dx*j/w, 1, P[0].get(0,2)+Dy*i/h]).reshape(1,3);
-                    pixproj = projetarTela(curpix);
-                    pixrgb = imgCtx.getImageData(arredondar(pixproj.get(0,0),0),
-                                                arredondar(pixproj.get(0,1),0),1,1).data;
-                    pos = 4*(i*w + j);
-                    buffer[pos] = pixrgb[0];
-                    buffer[pos+1] = pixrgb[1];
-                    buffer[pos+2] = pixrgb[2];
-                    buffer[pos+3] = pixrgb[3];
-                }
-            }
+            // vert é o array com as coordenadas dos pontos na tela
+            // pontos é o array com as coordenadas dos pontos no espaço            
+            var vert = [pontosExtrair[0], pontosExtrair[1], pontosExtrair[2], 0];
+            var pontos = [desprojetarTela(vert[0],lastButtonTex,ultimaProf), 
+                            desprojetarTela(vert[1],lastButtonTex,ultimaProf), 
+                            desprojetarTela(vert[2],lastButtonTex,ultimaProf), 
+                            0];            
+
+            // Obter os outros pontos e a textura através da classe Plano
+            var novoPlano = new Plano(vert,pontos,lastButtonTex); 
+            planos.push(novoPlano);
 
             // Colocar os dados no canvas
-            adicQuadrilatero(P, imagedata_to_image(imgData));
+            adicQuadrilatero(novoPlano);
 
-            // Atualizar pontosExtrair para desenhar
-            pontosExtrair = nj.concatenate(v).reshape(-1,2);
+            // Atualizar pontosExtrair para receber próximos pontos
+            pontosExtrair = [];
     }
 }
 // -----------------------

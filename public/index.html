@@ -25,30 +25,37 @@
                   <a id='btGuiaY' href='javascript:guiaY()'>Eixo Y</a>
                   <a id='btGuiaZ' href='javascript:guiaZ()'>Eixo Z</a>
                   <a href='javascript:calcularCam()'>Calcular</a>
-                  <a id='btExtrair' href='javascript:botaoExtrairTextura()'>Extrair</a>
                   <a href='javascript:salvarJson()'>Salvar Calibração (.json)</a>
                   <a href='javascript:carregarJson()'>Carregar Calibração (.json)</a>
                 </div>
             </div>
+            <div class='dropdown'>
+                <button class='dropdown-bt'>Extração</button>
+                <div class='dropdown-conteudo'>
+                  <a id='btPlanoYZ' href='javascript:botaoPlanoYZ()'>Plano YZ</a>
+                  <a id='btPlanoXZ' href='javascript:botaoPlanoXZ()'>Plano XZ</a>
+                  <a id='btPlanoXY' href='javascript:botaoPlanoXY()'>Plano XY</a>
+                  <a id='btExtrair' href='javascript:botaoExtrairTextura()'>Extrair</a>
+                </div>
+            </div>
         </div>
 
-        <div id='imagemDiv'>
+        <div id='subDiv'>
             <canvas id = 'imagemCanvas' height='800' width='1200'></canvas>        
         </div>
 
-        <div id='texturaDiv'>
-            <div id='subTextura'>
-                <canvas id = 'texturaCanvas' height='400' width='400'></canvas>
-            </div>
-            <div id='subTextura'>
-                <p id ='output'> Realize o cálculo da câmera para <br/> as variáveis aparecerem aqui. </p>
-            </div>
+        <div id='subDiv'>
+            <canvas id = 'texturaCanvas' height='800' width='1200'></canvas>
+        </div>
+        
+        <div id="subDiv">
+            <p id ='output'> Realize o cálculo da câmera para <br/> as variáveis aparecerem aqui. </p>
         </div>
     </div>
 
     <script src='packages/numjs.js'></script>
     <script src='packages/three.js-master\build\three.js'></script>
-    <script src='packages/three.js-master\examples\js\controls\OrbitControls.js'></script>
+    <script src='packages/three.js-master\examples\js\controls\FlyControls.js'></script>
     <script type='text/javascript' src='code/scripts/input.js'></script>
     <script type='text/javascript' src='code/scripts/utils.js'></script>
     <script type='text/javascript' src='code/scripts/update.js'></script>

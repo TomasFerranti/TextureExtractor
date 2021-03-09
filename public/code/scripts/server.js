@@ -17,13 +17,8 @@ function salvarJson() {
         alert('Calibre a câmera antes de salvar!');
         return;
     }
-    
-    // Deixar só a imagem para poder coletar os dados
-    imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
-    imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-                                0, 0, imgCanvas.width, imgCanvas.height);
 
-    var data = {'imagem':imgCanvas.toDataURL(),
+    var data = {'imagem':imgCanvasSec.toDataURL(),
                 'base':baseXYZ.toJSON(),
                 'centrooptico':CO.toJSON(),
                 'camera':C.toJSON()};

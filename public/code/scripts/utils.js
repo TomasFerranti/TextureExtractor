@@ -3,17 +3,41 @@
 // -----------------------
 // ÚTEIS AO JAVASCRIPT
 
-// Transformar um objeto imagedata em img
-function imagedata_to_image(imagedata_fun) {
-    var canvas_fun = document.createElement('canvas');
-    var ctx_fun = canvas_fun.getContext('2d');
-    canvas_fun.width = imagedata_fun.width;
-    canvas_fun.height = imagedata_fun.height;
-    ctx_fun.putImageData(imagedata_fun, 0, 0);
+// Cria um cópia de um array (JS) de arrays (numjs) para acabar com possíveis referências indesejadas
+function criarCopia(arr){
+    var novoArr = [];
+    for (var i = 0; i < arr.length; i++) {
+        if(typeof(arr[i])=='number'){
+            novoArr.push(arr[i]);      
+        }else{
+            novoArr.push(arr[i].clone());            
+        }
+    }
+    return novoArr;
+}
 
-    var image_fun = new Image();
-    image_fun.src = canvas_fun.toDataURL();
-    return image_fun;
+// Criar um objeto imagedata para a texturar a partir do buffer
+function criarImagem(w,h){
+    // Criar o elemento escondido da imagem da textura a ser preenchida
+    var canvasEscondido = document.createElement('canvas');
+    var contextoEscondido = canvasEscondido.getContext('2d');
+    canvasEscondido.width = texCanvas.width;
+    canvasEscondido.height = texCanvas.height;
+    var imgEscondido = contextoEscondido.createImageData(w,h);
+    return imgEscondido;
+}
+
+// Transformar um objeto imagedata em img
+function imagedataParaImage(imagedataEscondido) {
+    var canvasEscondido = document.createElement('canvas');
+    var ctxEscondido = canvasEscondido.getContext('2d');
+    canvasEscondido.width = imagedataEscondido.width;
+    canvasEscondido.height = imagedataEscondido.height;
+    ctxEscondido.putImageData(imagedataEscondido, 0, 0);
+
+    var imageEscondido = new Image();
+    imageEscondido.src = canvasEscondido.toDataURL();
+    return imageEscondido;
 }
 
 // Limpar as variáveis de camera
@@ -29,7 +53,7 @@ function limparVarCamera(){
 // Limpar os pontos do canvas
 function limparPontosCanvas(){
     pontosGuia = [nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2)];
-    pontosExtrair = nj.array([]).reshape(-1,2);
+    pontosExtrair = [];
 }
 
 // Limpar todas as variáveis, câmera e pontos guias
@@ -120,19 +144,19 @@ function remHom(vector){
     return(nj.array([vector.get(0,0),vector.get(0,1)]).reshape(1,2));
 }
 
-// Desprojeta um 'vector' do canvas da imagem dado seu 'plano' no espaço
-function desprojetarTela(vector,plano) {
+// Desprojeta um 'vector' do canvas da imagem dado seu 'plano' no espaço e a profundidade deste plano
+function desprojetarTela(vector,plano,prof) {
     var Q = adicHom(vector).subtract(C);
     Q = nj.dot(baseXYZ.T,Q.reshape(3,1)).reshape(1,3);
     switch(plano){
-        case 'X':
-            Q = Q.multiply(1/Q.get(0,0));
+        case 'YZ':
+            Q = Q.multiply(prof/Q.get(0,0));
             break;
-        case 'Y':
-            Q = Q.multiply(1/Q.get(0,1));
+        case 'XZ':
+            Q = Q.multiply(prof/Q.get(0,1));
             break;
-        case 'Z':
-            Q = Q.multiply(1/Q.get(0,2));
+        case 'XY':
+            Q = Q.multiply(prof/Q.get(0,2));
             break;
         default:
             // pass
@@ -146,5 +170,55 @@ function projetarTela(vector){
     Q = Q.multiply(-C.get(0,2)/Q.get(0,2)).add(C);
     Q = remHom(Q);
     return(Q); 
+}
+
+// Dado um ponto e um segmento de reta (definido por dois pontos), calcula a distância
+function distanciaSegmento(x,y,x1,y1,x2,y2){
+    var A = x - x1;
+    var B = y - y1;
+    var C = x2 - x1;
+    var D = y2 - y1;
+    var dot = A * C + B * D;
+    var len_sq = C * C + D * D;
+    var param = -1;
+    if (len_sq != 0)
+        param = dot / len_sq;
+    
+    var xx, yy;
+    if (param < 0) {
+        xx = x1;
+        yy = y1;
+    }else if(param > 1) {
+        xx = x2;
+        yy = y2;
+    }else {
+        xx = x1 + param * C;
+        yy = y1 + param * D;
+    }
+    var dx = x - xx;
+    var dy = y - yy;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Obtém os dois pontos pertencentes aos segmentos mais próximos do mouse
+function segmentoMaisProximo(mouse){
+    var ci, cj, cd;
+    var dist = 20000;
+    for(var j=0; j<planos.length;j++){
+        for(var i=0; i<4; i++){
+            cd = distanciaSegmento(mouse.get(0,0), mouse.get(0,1),
+                                   planos[j].v[i].get(0,0), planos[j].v[i].get(0,1),
+                                   planos[j].v[(i+1)%4].get(0,0), planos[j].v[(i+1)%4].get(0,1));
+            if(cd<dist){
+                dist = cd;
+                ci = i;
+                cj = j;
+            }
+        }
+    }
+    var ponto1 = planos[cj].v[ci].clone();
+    var ponto2 = planos[cj].v[(ci+1)%4].clone();
+    var profundidade = planos[cj].P[(ci+1)%4].get(0,auxDic[lastButtonTex]);
+    return [ponto1, ponto2, profundidade];
 }
 // -----------------------

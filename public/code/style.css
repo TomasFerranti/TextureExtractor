@@ -29,24 +29,10 @@ canvas {
     background: white;
 }
 
-#imagemDiv{
+#subDiv{
     position: relative;
     height: auto;
     margin: 0 auto;
-    border: 1px solid black;
-}
-
-#texturaDiv{
-    position: relative;
-    height: 500px;
-    margin: 0 auto;
-    border: 1px solid black;
-}
-
-#subTextura{
-    width: 49.8%;
-    height: 100%;
-    float: left;
     border: 1px solid black;
 }
 
