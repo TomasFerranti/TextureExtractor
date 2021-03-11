@@ -16,7 +16,7 @@ function iniciar(){
     renderizador = new THREE.WebGLRenderer({ canvas: texCanvas });
     renderizador.setSize(texCanvas.width,texCanvas.height);
     
-    // Posição da câmera
+    // Posição improvisada da câmera
     regular = 1/C.get(0,1);
     camera.position.x = C.get(0,0)*regular;
     camera.position.y = C.get(0,1)*regular;
@@ -36,7 +36,7 @@ function iniciar(){
     controles.dragToLook = true;
 }
 
-// Função responsável por desenhar os planos dado o array do javascript com os pontos em numjs e um objeto imagem como textura
+// Função responsável por desenhar os planos dado um objeto da classe Plano criado em calc.js
 function adicQuadrilatero(plano){
     var quad_vertices_vec = criarCopia(plano.P);
     var imagem = imagedataParaImage(plano.textura);
