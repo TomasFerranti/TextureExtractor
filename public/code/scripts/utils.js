@@ -43,16 +43,16 @@ function imagedataParaImage(imagedataEscondido) {
 // Limpar as variáveis de camera
 function limparVarCamera(){
     statusCalibracao = 'naoCalculada';
-    // texCtx.clearRect(0, 0, texCanvas.width, texCanvas.height);
-    pontosDeFuga = nj.array([]).reshape(-1,2);
-    C = nj.array([]).reshape(-1,3);  
-    baseXYZ = nj.zeros([3,3]);
+    pontosDeFuga = [];
+    C = new THREE.Vector3();  
+    baseXYZ = new THREE.Matrix3();
+    CO = new THREE.Vector2();
     document.getElementById('output').innerHTML = 'Realize o cálculo da câmera para <br/> as variáveis aparecerem aqui.';
 }
 
 // Limpar os pontos do canvas
 function limparPontosCanvas(){
-    pontosGuia = [nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2)];
+    pontosGuia = [[],[],[]];
     pontosExtrair = [];
 }
 
@@ -67,8 +67,8 @@ function reta(A,B,cor){
 	imgCtx.strokeStyle = cor;
 	imgCtx.lineWidth = 3;
 	imgCtx.beginPath();
-	imgCtx.moveTo(A.get(0,0),A.get(0,1));
-	imgCtx.lineTo(B.get(0,0),B.get(0,1));
+	imgCtx.moveTo(A.x,A.y);
+	imgCtx.lineTo(B.x,B.y);
 	imgCtx.stroke();
 };
 
@@ -102,9 +102,7 @@ function arr_igual(a1, a2){
 
 // Calcula a área do triangulo delimitado pelos três pontos no R^2
 function area_triangulo(p,q,r){
-    return(p.get(0,0) * q.get(0,1) + q.get(0,0) * r.get(0,1) + 
-    r.get(0,0) * p.get(0,1) - p.get(0,1) * q.get(0,0) - 
-    q.get(0,1) * r.get(0,0) - r.get(0,1) * p.get(0,0)); 
+    return(p.x*q.y + q.x*r.y + r.x*p.y - p.y*q.x - q.y*r.x - r.y*p.x);
 }
 
 // Calcula a interseção da reta determinada por dois segmentos de reta
@@ -113,50 +111,44 @@ function inter_retas(p,q,r,s){
     var a1 = area_triangulo(p, q, r);
     var a2 = area_triangulo(q, p, s);
     var amp = a1/(a1+a2);
-    return (r.multiply(1-amp).add(s.multiply(amp)));
+    var result = new THREE.Vector2();
+    return result.addVectors(r.multiplyScalar(1-amp),s.multiplyScalar(amp));
 }
 
 // Projeta o vetor 'Va' no vetor 'Vb' e adiciona uma posição 'q'
 function proj(Va, Vb, q){
-    var c = Va.get(0,0)*Vb.get(0,0) + Va.get(0,1)*Vb.get(0,1);
-    var v = Vb.get(0,0)*Vb.get(0,0) + Vb.get(0,1)*Vb.get(0,1);
-    var P = Vb.multiply(c/v);
-    return (P.add(q));
-}
-
-// Retorna a norma do 'vector'
-function norma(vector){
-    return( nj.sum(vector.pow(2))**(1/2));
-}
-
-// Retorna o 'vector' normalizado
-function normalizar(vector){
-    return(vector.multiply(1/norma(vector)));
+    var c = Va.x*Vb.x + Va.y*Vb.y;
+    var v = Vb.x*Vb.x + Vb.y*Vb.y;
+    var P = Vb.multiplyScalar(c/v);
+    return (P.addVectors(P,q));
 }
 
 // Adiciona uma terceira coordenada zero ao 'vector'
 function adicHom(vector){
-    return(nj.array([vector.get(0,0),vector.get(0,1),0]).reshape(1,3));
+    var result = new THREE.Vector3(vector.x,vector.y,0);
+    return(result);
 }
 
 // Remove a terceira coordenada do 'Vector'
 function remHom(vector){
-    return(nj.array([vector.get(0,0),vector.get(0,1)]).reshape(1,2));
+    var result = new THREE.Vector2(vector.x,vector.y)
+    return(result);
 }
 
 // Desprojeta um 'vector' do canvas da imagem dado seu 'plano' no espaço e a profundidade deste plano
 function desprojetarTela(vector,plano,prof) {
-    var Q = adicHom(vector).subtract(C);
-    Q = nj.dot(baseXYZ.T,Q.reshape(3,1)).reshape(1,3);
+    vector = adicHom(vector);
+    var Q = vector.subVectors(vector,C);
+    Q = Q.applyMatrix3(baseXYZ.clone().transpose());
     switch(plano){
         case 'YZ':
-            Q = Q.multiply(prof/Q.get(0,0));
+            Q.multiplyScalar(prof/Q.x);
             break;
         case 'XZ':
-            Q = Q.multiply(prof/Q.get(0,1));
+            Q.multiplyScalar(prof/Q.y);
             break;
         case 'XY':
-            Q = Q.multiply(prof/Q.get(0,2));
+            Q.multiplyScalar(prof/Q.z);
             break;
         default:
             // pass
@@ -166,9 +158,10 @@ function desprojetarTela(vector,plano,prof) {
   
 // Projeta um 'vector' do sistema de coordenadas do espaço na tela
 function projetarTela(vector){
-    var Q = nj.dot(baseXYZ,vector.reshape(3,1)).reshape(1,3);
-    Q = Q.multiply(-C.get(0,2)/Q.get(0,2)).add(C);
-    Q = remHom(Q);
+    var Q = vector.applyMatrix3(baseXYZ);
+    Q.multiplyScalar(-C.z/Q.z);
+    Q.addVectors(Q,C);
+    Q = remHom(Q.clone());
     return(Q); 
 }
 
@@ -206,9 +199,9 @@ function segmentoMaisProximo(mouse){
     var dist = 20000;
     for(var j=0; j<planos.length;j++){
         for(var i=0; i<4; i++){
-            cd = distanciaSegmento(mouse.get(0,0), mouse.get(0,1),
-                                   planos[j].v[i].get(0,0), planos[j].v[i].get(0,1),
-                                   planos[j].v[(i+1)%4].get(0,0), planos[j].v[(i+1)%4].get(0,1));
+            cd = distanciaSegmento(mouse.x, mouse.y,
+                                   planos[j].v[i].x, planos[j].v[i].y,
+                                   planos[j].v[(i+1)%4].x, planos[j].v[(i+1)%4].y);
             if(cd<dist){
                 dist = cd;
                 ci = i;
@@ -218,7 +211,25 @@ function segmentoMaisProximo(mouse){
     }
     var ponto1 = planos[cj].v[ci].clone();
     var ponto2 = planos[cj].v[(ci+1)%4].clone();
-    var profundidade = planos[cj].P[(ci+1)%4].get(0,auxDic[lastButtonTex]);
+    var profundidade = planos[cj].P[(ci+1)%4][coordDic[lastButtonTex]];
     return [ponto1, ponto2, profundidade];
+}
+
+// Criar o objeto do THREE a partir de um array
+function criarObjeto(arr){
+    switch(arr.length){
+        case 2:
+            var objeto = new THREE.Vector2(arr[0],arr[1]);
+            break;
+        case 3:
+            var objeto = new THREE.Vector3(arr[0],arr[1],arr[2]);
+            break;
+        case 9:
+            var objeto = new THREE.Matrix3();
+            objeto['elements'] = arr;
+            break;
+        default:
+    }
+    return(objeto);
 }
 // -----------------------

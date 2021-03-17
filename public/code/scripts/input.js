@@ -38,6 +38,8 @@ function carregarImagemWeb() {
 
 function calcularCam() {
 	calc();
+	iniciar();
+	animar();
 	attElementosHTML();
 };
 
@@ -79,7 +81,7 @@ function botaoExtrairTextura() {
 // ENTRADA DOS PONTOS CALIBRAÇÃO / EXTRAÇÃO
 
 // Declarando variáveis globais: pontos guias da calibração e pontos de extração
-var pontosGuia = [nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2),nj.array([]).reshape(-1,2)];
+var pontosGuia = [[],[],[]];
 var pontosExtrair = [];
 
 // Clicou no canvas
@@ -91,21 +93,21 @@ imgCanvas.addEventListener('click', function (e) {
 
 	// Posição do mouse
 	var rect = imgCanvas.getBoundingClientRect();
-	var mouse = nj.array([e.pageX-rect.x-window.pageXOffset,e.pageY-rect.y-window.pageYOffset]).reshape(1,2);
+	var mouse = new THREE.Vector2(e.pageX-rect.x-window.pageXOffset,e.pageY-rect.y-window.pageYOffset);
 
 	// Último botão clicado
 	switch (lastButton){
 		case 'X':
-			pontosGuia[0] = nj.concatenate(pontosGuia[0].T,mouse.T).T;
+			pontosGuia[0].push(mouse.clone());
 			break;
 		case 'Y':
-			pontosGuia[1] = nj.concatenate(pontosGuia[1].T,mouse.T).T;
+			pontosGuia[1].push(mouse.clone());
 			break;
 		case 'Z':
-			pontosGuia[2] = nj.concatenate(pontosGuia[2].T,mouse.T).T;
+			pontosGuia[2].push(mouse.clone());
 			break;
 		case 'extrair':
-			extrairTextura(mouse);							
+			extrairTextura(mouse.clone());							
 			break;
 		default:
 			// Pass

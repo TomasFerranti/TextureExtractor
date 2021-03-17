@@ -26,29 +26,29 @@ function attElementosHTML(){
     
     // Pontos dos eixos
     for (var j = 0; j < 3; j++){        
-        for (var i = 0; i < pontosGuia[j].shape[0]; i++) {
-            ponto(pontosGuia[j].get(i,0), pontosGuia[j].get(i,1), 3,'black');
+        for (var i = 0; i < pontosGuia[j].length; i++) {
+            ponto(pontosGuia[j][i].x, pontosGuia[j][i].y, 3,'black');
         }
     }
     
     // Linhas
     var corLinha = ['red','green','blue'];
     for (var j = 0; j < 3; j++){        
-        var tam = pontosGuia[j].shape[0];
+        var tam = pontosGuia[j].length;
         for (var i = 0; i < (tam-tam%2)/2; i++) {
-            reta(pontosGuia[j].slice([2*i,2*i+1]),pontosGuia[j].slice([2*i+1,2*i+2]),corLinha[j]);
+            reta(pontosGuia[j][2*i],pontosGuia[j][2*i+1],corLinha[j]);
         }
     }
 
     // Pontos da textura
     for (var i = 0; i < pontosExtrair.length; i++) {
-        ponto(pontosExtrair[i].get(0,0), pontosExtrair[i].get(0,1), 5,'orange');
+        ponto(pontosExtrair[i].x, pontosExtrair[i].y, 5,'orange');
     }
     
     // Planos
     for (var j = 0; j < planos.length; j++) {
         for (var i = 0; i < 4; i++) {
-            ponto(planos[j].v[i].get(0,0), planos[j].v[i].get(0,1), 3,'orange');
+            ponto(planos[j].v[i].x, planos[j].v[i].y, 3,'orange');
         }
         for (var i = 0; i < 3; i++) {
             reta(planos[j].v[i],planos[j].v[i+1],'yellow');
@@ -57,6 +57,6 @@ function attElementosHTML(){
     }
 
     // Ortocentro
-	ponto(C.get(0,0),C.get(0,1),10,'pink');
+	ponto(C.x,C.y,10,'pink');
 }
 // -----------------------

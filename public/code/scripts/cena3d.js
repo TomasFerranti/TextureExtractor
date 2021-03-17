@@ -17,11 +17,11 @@ function iniciar(){
     renderizador.setSize(texCanvas.width,texCanvas.height);
     
     // Posição improvisada da câmera
-    regular = 1/C.get(0,1);
-    camera.position.x = C.get(0,0)*regular;
-    camera.position.y = C.get(0,1)*regular;
-    camera.position.z = C.get(0,2)*regular;
-    camera.lookAt(CO.get(0,0)*regular,CO.get(0,1)*regular,0);
+    regular = 1/C.y;
+    camera.position.x = C.x*regular;
+    camera.position.y = C.y*regular;
+    camera.position.z = C.z*regular;
+    camera.lookAt(CO.x*regular,CO.y*regular,0);
     
     // Renderizar cena pela primeira vez
     renderizador.render(cena, camera);
@@ -42,9 +42,9 @@ function adicQuadrilatero(plano){
     var imagem = imagedataParaImage(plano.textura);
     var quad_vertices = [];
     for(var i=0; i<=3; i++){
-        quad_vertices.push(quad_vertices_vec[i].get(0,0));
-        quad_vertices.push(quad_vertices_vec[i].get(0,1));
-        quad_vertices.push(quad_vertices_vec[i].get(0,2));
+        quad_vertices.push(quad_vertices_vec[i].x);
+        quad_vertices.push(quad_vertices_vec[i].y);
+        quad_vertices.push(quad_vertices_vec[i].z);
     };
     
     // Designa ordem dos vértices para desenho

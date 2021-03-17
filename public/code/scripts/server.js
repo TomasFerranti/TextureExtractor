@@ -13,15 +13,16 @@ function salvarJson() {
     }
     filename += '.json';
 
-    if (arr_igual(baseXYZ,nj.zeros([3,3]))){
+    if (baseXYZ.equals(new THREE.Matrix3())){
         alert('Calibre a câmera antes de salvar!');
         return;
     }
 
     var data = {'imagem':imgCanvasSec.toDataURL(),
-                'base':baseXYZ.toJSON(),
-                'centrooptico':CO.toJSON(),
-                'camera':C.toJSON()};
+                'base':baseXYZ.toArray(),
+                'centrooptico':CO.toArray(),
+                'camera':C.toArray(),
+                'pontosfuga':[pontosDeFuga[0].toArray(),pontosDeFuga[1].toArray(),pontosDeFuga[2].toArray()]};
     data = JSON.stringify(data);
 
     // Salvar dicionário 'data'
@@ -54,9 +55,10 @@ function carregarJson(){
         } else {
             limparTodasVar();
             data = JSON.parse(data);
-            baseXYZ = nj.array(JSON.parse(data.base));
-            C = nj.array(JSON.parse(data.camera));
-            CO = nj.array(JSON.parse(data.centrooptico));
+            baseXYZ = criarObjeto(data.base);
+            C = criarObjeto(data.camera);
+            CO = criarObjeto(data.centrooptico);
+            pontosDeFuga = [criarObjeto(data.pontosfuga[0]),criarObjeto(data.pontosfuga[1]),criarObjeto(data.pontosfuga[2])];
             imgImagem.src = data.imagem;
             statusCalibracao = 'carregada';
             mostrarResultados();
