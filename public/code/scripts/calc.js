@@ -242,6 +242,7 @@ function extrairTextura(mouse){
 
             // Colocar os dados no canvas
             adicQuadrilatero(novoPlano);
+            atualizaCamera();
 
             // Atualizar pontosExtrair para receber próximos pontos
             pontosExtrair = [];

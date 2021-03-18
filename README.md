@@ -4,23 +4,22 @@ Repositório criado para armazenar o código realizado ao projeto ImagineRio.
 
 ## Instalando os requerimentos (Windows)
 
-Para o arquivo .html rodar corretamente são necessárias duas coisas: instalar o Node e os pacotes utilizados no Javascript (numjs e threejs). Com isso, seguem abaixo os links onde você consegue achar esses arquivos.
+Para o arquivo .html rodar corretamente são necessárias duas coisas: instalar o Node e o pacote threejs utilizado no Javascript. Com isso, seguem abaixo os links onde você pode baixá-los.
 
 ### Node
 
-O Node possui diversas versões. A utilizada neste projeto é a v10 de 2018 devido à próxima versão não fornecer compatibilidade com o numjs. Com isso, uma boa prática para manter diversas versões do Node no computador chama-se Node Version Manager (NVM). Contanto, a instalação do NVM é opcional e você pode apenas instalar o Node.
+O Node possui diversas versões. Uma boa prática para manter diversas versões do Node no computador chama-se Node Version Manager (NVM). Contanto, a instalação do NVM é opcional e você pode apenas instalar o Node.
 
 - Para adquirir o NVM: https://github.com/coreybutler/nvm-windows/releases/tag/1.1.7;
-- Para instalar o node v10: https://nodejs.org/dist/latest-v10.x/win-x64/;
+- Para instalar o Node: https://nodejs.org/en/;
 
 ### Pacotes JavaScript
 
 Os pacotes utilizados no projeto foram escolhidos de maneira a facilitar o trabalho. Seguem abaixo as descrições:
 
-- Criar um arquivo Javascript chamado "numjs.js" com o conteúdo de https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js;
 - O threejs pode ser adquirido pela pasta descompactada do zip que se encontra em https://threejs.org/;
 
-Com isso, esse arquivo e essa pasta devem se encontrar dentro do diretório "public/packages", como será mostrado na próxima seção.
+Com isso, a pasta baixada deve se encontrar dentro do diretório "public/packages", como será mostrado na próxima seção.
 
 ### Verificando a instalação
 

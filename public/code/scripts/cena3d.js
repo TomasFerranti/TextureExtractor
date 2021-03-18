@@ -2,7 +2,7 @@
 
 // -----------------------
 // CONFIGURAÇÃO AMBIENTE 3D
-var cena, camera, renderizador, controles, regular;
+var cena, camera, renderizador, controles;
 var texCanvas = document.getElementById('texturaCanvas');
 // Função chamada após calibrar a câmera, fazendo o setup do ambiente 3D
 function iniciar(){
@@ -15,13 +15,6 @@ function iniciar(){
     );
     renderizador = new THREE.WebGLRenderer({ canvas: texCanvas });
     renderizador.setSize(texCanvas.width,texCanvas.height);
-    
-    // Posição improvisada da câmera
-    regular = 1/C.y;
-    camera.position.x = C.x*regular;
-    camera.position.y = C.y*regular;
-    camera.position.z = C.z*regular;
-    camera.lookAt(CO.x*regular,CO.y*regular,0);
     
     // Renderizar cena pela primeira vez
     renderizador.render(cena, camera);
@@ -101,5 +94,16 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderizador.setSize(texCanvas.width ,texCanvas.height);
 }
-
 window.addEventListener('resize', onWindowResize, false);
+
+// ATUALIZA CÂMERA
+function atualizaCamera(){
+    var centro = new THREE.Vector3();
+    for(var i=0; i<planos.length; i++){
+        for(var j=0; j<4; j++){
+            centro.addVectors(centro,planos[i].P[j]);
+        }
+    }
+    centro.multiplyScalar(1/(planos.length*4));
+    camera.lookAt(centro.x,centro.y,centro.z);
+}
