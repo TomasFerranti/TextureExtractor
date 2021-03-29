@@ -1,6 +1,6 @@
-# ImagineRio
+# Extrator de Texturas
 
-Repositório criado para armazenar o código realizado ao projeto ImagineRio.
+Repositório criado para armazenar o código realizado ao projeto Vistas Situadas do Rio de Janeiro (uma colaboração entre a Universidade de Rice, responsável imagineRio, e o Instituto Moreira Salles) pela FGVRJ.
 
 ## Instalando os requerimentos (Windows)
 
