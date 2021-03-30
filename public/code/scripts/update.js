@@ -42,7 +42,7 @@ function attElementosHTML(){
 
     // Pontos da textura
     for (var i = 0; i < pontosExtrair.length; i++) {
-        ponto(pontosExtrair[i].x, pontosExtrair[i].y, 5,'orange');
+        ponto(pontosExtrair[i].x, pontosExtrair[i].y, 5,'purple');
     }
     
     // Planos

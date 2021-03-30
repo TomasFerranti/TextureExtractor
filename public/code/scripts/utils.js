@@ -209,10 +209,7 @@ function segmentoMaisProximo(mouse){
             }
         }
     }
-    var ponto1 = planos[cj].v[ci].clone();
-    var ponto2 = planos[cj].v[(ci+1)%4].clone();
-    var profundidade = planos[cj].P[(ci+1)%4][coordDic[lastButtonTex]];
-    return [ponto1, ponto2, profundidade];
+    return [cj, ci];
 }
 
 // Criar o objeto do THREE a partir de um array

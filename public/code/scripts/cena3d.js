@@ -98,12 +98,29 @@ window.addEventListener('resize', onWindowResize, false);
 
 // ATUALIZA CÂMERA
 function atualizaCamera(){
+    var ultimoPlano = planos[planos.length-1];
+    
     var centro = new THREE.Vector3();
-    for(var i=0; i<planos.length; i++){
-        for(var j=0; j<4; j++){
-            centro.addVectors(centro,planos[i].P[j]);
-        }
+    for(var j=0; j<4; j++){
+        centro.addVectors(centro,ultimoPlano.P[j]);
     }
-    centro.multiplyScalar(1/(planos.length*4));
+    centro.multiplyScalar(1/4);
+
+    var v1 = ultimoPlano.P[0].clone().subVectors(ultimoPlano.P[1],ultimoPlano.P[0]);
+    var v2 = ultimoPlano.P[0].clone().subVectors(ultimoPlano.P[3],ultimoPlano.P[0]);
+    var maximo = Math.max(v1.length(),v2.length());
+    var normalPlano = v1.clone().crossVectors(v1,v2);
+    normalPlano.multiplyScalar(3/2*maximo/normalPlano.length());
+    var posCamera = centro.clone().addVectors(centro,normalPlano);
+
+    camera.position.x = posCamera.x;
+    camera.position.y = posCamera.y;
+    camera.position.z = posCamera.z;
     camera.lookAt(centro.x,centro.y,centro.z);
+
+    var angulos = camera.rotation.toVector3();
+    if(ultimoPlano.planoParalelo != 'XY'){
+        angulos.x = Math.PI/2;
+    }
+    camera.rotation.setFromVector3(angulos);
 }

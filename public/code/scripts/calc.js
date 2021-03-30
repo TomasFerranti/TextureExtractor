@@ -93,39 +93,77 @@ var coordDic = {'YZ':'x','XZ':'y','XY':'z'};
 class Plano {
     // v são os pontos do canvas 2D e P os pontos no espaço 3D
     // O array P possui três pontos inicialmente: dois de orientação do plano anterior e um para extensão
-    constructor(v,P,planoParalelo) {
+    constructor(indPlano,indSeg) {
+        this.indPlanoCon = indPlano;
+        this.indSegCon = indSeg;
+        this.planoParalelo = lastButtonTex;
+
+        var v = [pontosExtrair[0], pontosExtrair[1], pontosExtrair[2], 0];
+        var P = [desprojetarTela(v[0].clone(),lastButtonTex,ultimaProf), 
+                 desprojetarTela(v[1].clone(),lastButtonTex,ultimaProf), 
+                 desprojetarTela(v[2].clone(),lastButtonTex,ultimaProf), 
+                 0]; 
+        
         this.v = criarCopia(v);
         this.P = criarCopia(P);
-        this.planoParelelo = planoParalelo;
         this.obterPontos();
     }
 
-    obterPontos(){
-        var v = this.v;
-        var P = this.P;
-        // Ponto de orientação
-        var auxPoint = desprojetarTela(this.v[2].clone(),
-                                       this.planoParelelo,
-                                       this.P[0][coordDic[this.planoParelelo]]);
-        // Posição dos outros dois pontos dependendo do plano paralelo
-        switch (this.planoParelelo){
-            case 'XY':
-                P[2] = new THREE.Vector3(auxPoint.x,P[0].y,P[0].z);
-                P[3] = new THREE.Vector3(auxPoint.x,P[1].y,P[0].z);
-                break;
-            case 'XZ':
-                P[2] = new THREE.Vector3(auxPoint.x,P[0].y,P[1].z);
-                P[3] = new THREE.Vector3(auxPoint.x,P[0].y,P[0].z);
-                break;
-            case 'YZ':
-                P[2] = new THREE.Vector3(P[0].x,auxPoint.y,P[1].z);
-                P[3] = new THREE.Vector3(P[0].x,auxPoint.y,P[0].z);
-                break;
-            default:
+    // Fornece os índices dos pontos para cálculo posterior
+    obterIndice(){
+        var casoBase = {'YZ':[1,'y','z'], 'XZ':[1,'x','z'] ,'XY':[1,'x','y']};
+        if(this.indPlanoCon==null){
+            return casoBase[this.planoParalelo];
         }
-        // A posição deles na tela
-        v[2] = projetarTela(P[2].clone());
-        v[3] = projetarTela(P[3].clone());
+        // Plano atual, plano conectado, segmento conectado, novo índice, coordenada do ponto auxiliar, coordenada dos outros pontos
+        var casos = [['XY','XY',0,3,'x','y'],['XY','XY',1,0,'y','x'],['XY','XY',2,1,'x','y'],['XY','XY',3,2,'y','x'], // XY para XY
+        ['YZ','YZ',0,3,'y','z'],['YZ','YZ',1,0,'z','y'],['YZ','YZ',2,1,'y','z'],['YZ','YZ',3,2,'z','y'], // YZ para YZ
+        ['XZ','XZ',0,3,'x','z'],['XZ','XZ',1,0,'z','x'],['XZ','XZ',2,1,'x','z'],['XZ','XZ',3,2,'z','x'], // XZ para XZ
+        ['XY','YZ',1,3,'x','y'],['XY','YZ',3,1,'x','y'],['XY','XZ',1,0,'y','x'],['XY','XZ',3,2,'y','x'], // YZ/XZ para XY
+        ['YZ','XY',0,0,'z','y'],['YZ','XY',2,2,'z','y'],['YZ','XZ',0,3,'y','z'],['YZ','XZ',2,1,'y','z'], // XZ/XY para YZ
+        ['XZ','XY',1,0,'z','x'],['XZ','XY',3,2,'z','x'],['XZ','YZ',0,3,'x','z'],['XZ','YZ',2,1,'x','z']  // XZ/YZ para XZ
+        ];
+        for(var j=0; j<casos.length; j++){
+            var caso = casos[j];
+            if(this.planoParalelo==caso[0] && this.indSegCon==caso[2] && planos[this.indPlanoCon].planoParalelo==caso[1]){
+                return [caso[3],caso[4],caso[5]];
+            }
+        }
+    }
+
+    // Obtém o restante dos pontos na tela e no espaço
+    obterPontos(){
+        // Pontos de orientação
+        var subP = criarCopia(this.P);
+        this.P = [];
+        for(var j=0; j<4;j++){
+            this.P.push(new THREE.Vector3());
+            this.P[j][coordDic[this.planoParalelo]] = ultimaProf;
+        }
+
+        // Corrigir orientação
+        var [indP0, coordAux, coordPonto] = this.obterIndice();
+        indP0 = indP0 + 4;
+
+        // Pondo os dois pontos iniciais na posição correta
+        if(this.indPlanoCon==null){
+            this.P[(indP0-1)%4] = subP[0].clone();
+            this.P[indP0%4] = subP[1].clone();
+        }else{
+            this.P[indP0%4] = subP[0].clone();
+            this.P[(indP0-1)%4] = subP[1].clone();
+        };
+
+        // Preenchendo a posição dos outros dois pontos dependendo do plano paralelo pelo obterIndice()
+        this.P[(indP0+1)%4][coordAux] = subP[2][coordAux];
+        this.P[(indP0+2)%4][coordAux] = subP[2][coordAux];
+        this.P[(indP0+1)%4][coordPonto] = this.P[(indP0)%4][coordPonto];
+        this.P[(indP0+2)%4][coordPonto] = this.P[(indP0-1)%4][coordPonto];
+
+        // Atualizar posição deles na tela
+        for(var j=0; j<4; j++){
+            this.v[j] = projetarTela(this.P[j].clone());
+        }
 
         // Extrair a textura
         this.obterTextura();
@@ -161,7 +199,7 @@ class Plano {
         for (var i = 0; i < h; i++) {
             for (var j = 0; j < w; j++) {
                 // A direção para onde os pixels andam depende do plano
-                switch(this.planoParelelo){
+                switch(this.planoParalelo){
                     case 'XY':
                         curdt = new THREE.Vector3(dt.x*j/w,
                                                   dt.y*i/h, 
@@ -204,6 +242,7 @@ imgCanvasSec.height = imgCanvas.height;
 // Variáveis globais do canvas da textura
 var planos = [];
 var ultimaProf = 1;
+var indPlano, indSeg;
 // Função chamada quando se clica no canvas com extrair selecionado
 function extrairTextura(mouse){
     // Caso não tenha o cálculo da câmera
@@ -218,26 +257,22 @@ function extrairTextura(mouse){
             if(planos.length==0){
                 pontosExtrair.push(mouse.clone());
             }else{
-                var pontosSeg = segmentoMaisProximo(mouse.clone());
-                pontosExtrair.push(pontosSeg[0]);
-                pontosExtrair.push(pontosSeg[1]);
-                ultimaProf = pontosSeg[2];
+                [indPlano, indSeg] = segmentoMaisProximo(mouse.clone());
+                pontosExtrair.push(planos[indPlano].v[indSeg%4]);
+                pontosExtrair.push(planos[indPlano].v[(indSeg+1)%4]);
             }
             break;
         default:
             // Adiciona o novo ponto
             pontosExtrair.push(mouse);
-            
-            // vert é o array com as coordenadas dos pontos na tela
-            // pontos é o array com as coordenadas dos pontos no espaço            
-            var vert = [pontosExtrair[0], pontosExtrair[1], pontosExtrair[2], 0];
-            var pontos = [desprojetarTela(vert[0].clone(),lastButtonTex,ultimaProf), 
-                          desprojetarTela(vert[1].clone(),lastButtonTex,ultimaProf), 
-                          desprojetarTela(vert[2].clone(),lastButtonTex,ultimaProf), 
-                          0];            
+
+            // Atualizar profundidade
+            if(planos.length!=0){
+                ultimaProf = planos[indPlano].P[indSeg][coordDic[lastButtonTex]];
+            }
 
             // Obter os outros pontos e a textura através da classe Plano
-            var novoPlano = new Plano(vert,pontos,lastButtonTex); 
+            var novoPlano = new Plano(indPlano,indSeg); 
             planos.push(novoPlano);
 
             // Colocar os dados no canvas
