@@ -55,6 +55,6 @@ Atualmente se encontram duas calibrações como exemplo, "cabex1" e "cabex2".
 
 ### Extração
 
-Trabalho em andamento, atualmente se pode extrair as texturas da seguinte maneira: primeiro se escolhe o plano paralelo e clica-se no botão extrair. Depois disso, selecione três pontos no canvas da imagem: dois no mesmo eixo e um para "extensão". Com isso, este será criado no ambiente 3D que ainda está com uma configuração não adequada de câmera. O controle da câmera se é realizado através das teclas WASD para movimento de sua posição e SETAS para controle de ângulo.
+Trabalho em andamento, atualmente se pode extrair as texturas da seguinte maneira: primeiro se escolhe o plano paralelo e clica-se no botão extrair. Depois disso, selecione três pontos no canvas da imagem: dois no mesmo eixo e um para "extensão". Com isso, este será criado no ambiente 3D. Para alternar entre o ambiente 3D e 2D basta pressionar a tecla T. O controle da câmera se é realizado através das teclas WASD para movimento de sua posição e SETAS para controle de ângulo.
 
 Assim, para criar outros planos você deve selecionar novamente o novo plano paralelo e clicar no segmento de reta de onde deseja extender, e depois o ponto de extensão. Este também será adicionado à cena 3D.

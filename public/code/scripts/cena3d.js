@@ -3,7 +3,10 @@
 // -----------------------
 // CONFIGURAÇÃO AMBIENTE 3D
 var cena, camera, renderizador, controles;
-var texCanvas = document.getElementById('texturaCanvas');
+var texCanvas = document.createElement('canvas');
+texCanvas.id = 'texturaCanvas';
+texCanvas.height = 800;
+texCanvas.width = 1200;
 // Função chamada após calibrar a câmera, fazendo o setup do ambiente 3D
 function iniciar(){
     cena = new THREE.Scene();
@@ -106,11 +109,18 @@ function atualizaCamera(){
     }
     centro.multiplyScalar(1/4);
 
+    var maxDist = centro.clone().subVectors(centro,planos[0].P[0]).length();
+    var curDist;
+    for(var j=0; j<planos.length; j++){
+        for(var i=0; i<4; i++){
+            curDist = centro.clone().subVectors(centro,planos[j].P[i]).length();
+        } 
+    }
+
     var v1 = ultimoPlano.P[0].clone().subVectors(ultimoPlano.P[1],ultimoPlano.P[0]);
     var v2 = ultimoPlano.P[0].clone().subVectors(ultimoPlano.P[3],ultimoPlano.P[0]);
-    var maximo = Math.max(v1.length(),v2.length());
     var normalPlano = v1.clone().crossVectors(v1,v2);
-    normalPlano.multiplyScalar(3/2*maximo/normalPlano.length());
+    normalPlano.multiplyScalar(3/2*maxDist/normalPlano.length());
     var posCamera = centro.clone().addVectors(centro,normalPlano);
 
     camera.position.x = posCamera.x;

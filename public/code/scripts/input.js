@@ -116,4 +116,24 @@ imgCanvas.addEventListener('click', function (e) {
 	// Atualizar a tela
 	attElementosHTML();
 });
+
+var curCanvas = '2d';
+// Clicou para trocar os canvas
+document.addEventListener("keyup", function(event) {	
+	if(event.keyCode == 84){
+		if(statusCalibracao == 'naoCalculada'){
+			alert('Calibre a câmera primeiro!');
+			return;
+		}
+		if(curCanvas == '2d'){
+			imgCanvas.parentNode.insertBefore(texCanvas, imgCanvas.nextSibling);
+        	imgCanvas.parentNode.removeChild(imgCanvas);
+			curCanvas = '3d';
+		}else{
+			texCanvas.parentNode.insertBefore(imgCanvas, texCanvas.nextSibling);
+        	texCanvas.parentNode.removeChild(texCanvas);
+			curCanvas = '2d';
+		};
+	};
+});
 // -----------------------

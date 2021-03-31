@@ -1,6 +1,6 @@
 body {
     margin: 0px;
-    background: #f1f3f5;
+    background: #d4d6d8;
 }
 
 #universo {
@@ -8,39 +8,52 @@ body {
     width: 100%;
     height: auto;
     margin: 0 auto;
-    /* margin: 20px 20px 20px;
-    */
-    border: 1px solid black;
 }
 
 #controles {
     position: relative;
     height: 5%;
     margin: 0px;
-    border: 1px solid black;
+    border: 3px solid black;
+}
+
+#subDiv{
+  text-align: center;
+  position: relative;
+  height: 805px;
+  margin: 0 auto;
+  border: 3px solid black;
+}
+
+#canvasDiv{
+  float:left;
+  display: inline-block;
+  width: auto;
+  height: auto;
+  border: 3px solid black;
 }
 
 canvas {
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    padding-left: 0;
+    padding-right: 0;
     margin-left: auto;
     margin-right: auto;
     background: white;
 }
 
-#subDiv{
-    position: relative;
-    height: auto;
-    margin: 0 auto;
-    border: 1px solid black;
+#textDiv{
+  overflow: hidden;
+  width: auto;
+  height: auto;
+  border: 3px solid black;
 }
 
-p {
-    text-align: center;
+span {
+    text-align: left;
 }
 
 .dropdown-bt {
+    display: block;
     min-width: 160px;
     height: 100%;
     cursor: pointer;

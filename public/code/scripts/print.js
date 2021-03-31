@@ -5,7 +5,7 @@
 
 // Mostrar resultados da calibração
 function mostrarResultados(){
-    var str = '';
+    var str = 'Clique T para trocar entre o ambiente 2D e 3D. <br/>';
 
     // Fx, Fy e Fz
     var strList = ['Fx','Fy','Fz'];
