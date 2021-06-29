@@ -87,15 +87,8 @@ function arredondar(x,n){
 
 // Verificar se dois arrays são iguais
 function arr_igual(a1, a2){
-    if ((a1.shape[0] != a2.shape[0]) || (a1.shape[1] != a2.shape[1])){
+    if (Math.abs(a1.x-a2.x)+Math.abs(a1.y-a2.y)+Math.abs(a1.z-a2.z) > 0.00001){
         return false;
-    }
-    for (var i=0; i<a1.shape[0];  i++){
-        for (var j=0; j<a1.shape[1]; j++){
-            if(a1.get(i,j)!=a2.get(i,j)){
-                return false;
-            }
-        }
     }
     return true;
 }
@@ -112,14 +105,14 @@ function inter_retas(p,q,r,s){
     var a2 = area_triangulo(q, p, s);
     var amp = a1/(a1+a2);
     var result = new THREE.Vector2();
-    return result.addVectors(r.multiplyScalar(1-amp),s.multiplyScalar(amp));
+    return result.addVectors(r.clone().multiplyScalar(1-amp),s.clone().multiplyScalar(amp));
 }
 
 // Projeta o vetor 'Va' no vetor 'Vb' e adiciona uma posição 'q'
 function proj(Va, Vb, q){
     var c = Va.x*Vb.x + Va.y*Vb.y;
     var v = Vb.x*Vb.x + Vb.y*Vb.y;
-    var P = Vb.multiplyScalar(c/v);
+    var P = Vb.clone().multiplyScalar(c/v);
     return (P.addVectors(P,q));
 }
 
@@ -137,8 +130,8 @@ function remHom(vector){
 
 // Desprojeta um 'vector' do canvas da imagem dado seu 'plano' no espaço e a profundidade deste plano
 function desprojetarTela(vector,plano,prof) {
-    vector = adicHom(vector);
-    var Q = vector.subVectors(vector,C);
+    vector2 = adicHom(vector);
+    var Q = vector2.subVectors(vector2,C);
     Q = Q.applyMatrix3(baseXYZ.clone().transpose());
     switch(plano){
         case 'YZ':
@@ -158,7 +151,7 @@ function desprojetarTela(vector,plano,prof) {
   
 // Projeta um 'vector' do sistema de coordenadas do espaço na tela
 function projetarTela(vector){
-    var Q = vector.applyMatrix3(baseXYZ);
+    var Q = vector.clone().applyMatrix3(baseXYZ);
     Q.multiplyScalar(-C.z/Q.z);
     Q.addVectors(Q,C);
     Q = remHom(Q.clone());
@@ -229,4 +222,36 @@ function criarObjeto(arr){
     }
     return(objeto);
 }
+
+// Funções novas com a adição de planos paralelos à um eixo
+// SCC para SCM
+function cameraParaMundo(p) {
+    var q = new THREE.Vector3();
+    q = p.clone().applyMatrix3(baseXYZ.clone().transpose());
+    return q;
+};
+  
+// SCM para SCC
+function mundoParaCamera(p) {
+    var q = new THREE.Vector3();
+    q = p.clone().applyMatrix3(baseXYZ);
+    return q;
+};
+
+// Dado um ponto da tela, o vetor do plano ortogonal ao eixo, um ponto do plano e seu eixo pararelo
+// Conseguimos obter suas coordenadas no espaço
+// v ponto da tela, dw interseção com pontos de fuga, p0 ponto do plano, eixo paralelo
+function desprojetarTela2(v, dw, p0, eixo) {
+    var Q = adicHom(v);
+    var Q = Q.subVectors(Q, C);
+    var Qw = cameraParaMundo(Q);
+    var e = new THREE.Vector3();
+    e[eixo] = 1;
+    var dwClone = dw.clone().normalize();
+    var n = dwClone.clone().crossVectors(dw,e);
+    var t = p0.dot(n)/Qw.dot(n);
+    Qw.multiplyScalar(t);
+    return Qw;
+};
+
 // -----------------------

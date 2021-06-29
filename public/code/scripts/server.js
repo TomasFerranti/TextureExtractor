@@ -18,11 +18,20 @@ function salvarJson() {
         return;
     }
 
+    var pontosGuiaData = []
+    for(var j=0; j<3; j++){
+        pontosGuiaData.push([])
+        for(var i=0; i<pontosGuia[j].length; i++){
+            pontosGuiaData[j].push(pontosGuia[j][i].toArray());
+        }
+    }
+
     var data = {'imagem':imgCanvasSec.toDataURL(),
+                'pontosguia':pontosGuiaData,
+                'pontosfuga':[pontosDeFuga[0].toArray(),pontosDeFuga[1].toArray(),pontosDeFuga[2].toArray()],
                 'base':baseXYZ.toArray(),
                 'centrooptico':CO.toArray(),
-                'camera':C.toArray(),
-                'pontosfuga':[pontosDeFuga[0].toArray(),pontosDeFuga[1].toArray(),pontosDeFuga[2].toArray()]};
+                'camera':C.toArray()};
     data = JSON.stringify(data);
 
     // Salvar dicionário 'data'
@@ -59,14 +68,22 @@ function carregarJson(){
             C = criarObjeto(data.camera);
             CO = criarObjeto(data.centrooptico);
             pontosDeFuga = [criarObjeto(data.pontosfuga[0]),criarObjeto(data.pontosfuga[1]),criarObjeto(data.pontosfuga[2])];
+            pontosGuia = [[],[],[]];
+            var pontosGuiaData = data.pontosguia;
+            for(var j=0; j<3; j++){
+                for(var i=0; i<pontosGuiaData[j].length; i++){
+                    pontosGuia[j].push(criarObjeto(pontosGuiaData[j][i]));
+                }
+            };
             imgImagem.src = data.imagem;
             statusCalibracao = 'carregada';
+            adicionarDadosPlanosOrts();
             mostrarResultados();
             iniciar();
             animar();
             attElementosHTML();
             alert('loaded: ' + filename);
-        }
+        };  
     });
 };
 // -----------------------

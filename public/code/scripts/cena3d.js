@@ -122,15 +122,16 @@ function atualizaCamera(){
     var normalPlano = v1.clone().crossVectors(v1,v2);
     normalPlano.multiplyScalar(3/2*maxDist/normalPlano.length());
     var posCamera = centro.clone().addVectors(centro,normalPlano);
-
+    
     camera.position.x = posCamera.x;
     camera.position.y = posCamera.y;
     camera.position.z = posCamera.z;
     camera.lookAt(centro.x,centro.y,centro.z);
 
     var angulos = camera.rotation.toVector3();
-    if(ultimoPlano.planoParalelo != 'XY'){
+    if(tiposPlano[ultimoPlano['tipoPlano']]['eixoPar'] == 'z'){
         angulos.x = Math.PI/2;
+        angulos.z = 0;
     }
     camera.rotation.setFromVector3(angulos);
 }

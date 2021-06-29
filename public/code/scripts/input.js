@@ -21,6 +21,8 @@ imgImagem.onload = function(){
 	imgCtxSec.clearRect(0, 0, imgCanvasSec.width, imgCanvasSec.height);
 	imgCtxSec.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
 								0, 0, imgCanvasSec.width, imgCanvasSec.height);
+	
+	attElementosHTML();
 };
 
 // -----------------------
@@ -70,6 +72,10 @@ function guiaZ() {
 	lastButton = 'Z';
 	attElementosHTML();
 };
+function botaoNovoPlano() {
+	lastButton = 'novoPlano';
+	attElementosHTML();
+}
 function botaoExtrairTextura() {
 	lastButton = 'extrair';
 	attElementosHTML();
@@ -95,6 +101,13 @@ imgCanvas.addEventListener('click', function (e) {
 	var rect = imgCanvas.getBoundingClientRect();
 	var mouse = new THREE.Vector2(e.pageX-rect.x-window.pageXOffset,e.pageY-rect.y-window.pageYOffset);
 
+	// Caso esteja fazendo outra coisa depois de criar um novo plano
+	if ((planoSeg.length > 0) && (lastButton != 'novoPlano')){
+		alert('Por favor termine de escolher os vértices do novo plano antes de usar outra ferramenta!');
+		attElementosHTML();
+		return;
+	}
+
 	// Último botão clicado
 	switch (lastButton){
 		case 'X':
@@ -105,6 +118,9 @@ imgCanvas.addEventListener('click', function (e) {
 			break;
 		case 'Z':
 			pontosGuia[2].push(mouse.clone());
+			break;
+		case 'novoPlano':
+			criarNovoPlano(mouse.clone());
 			break;
 		case 'extrair':
 			extrairTextura(mouse.clone());							
@@ -133,6 +149,7 @@ document.addEventListener("keyup", function(event) {
 			texCanvas.parentNode.insertBefore(imgCanvas, texCanvas.nextSibling);
         	texCanvas.parentNode.removeChild(texCanvas);
 			curCanvas = '2d';
+            attElementosHTML();
 		};
 	};
 });

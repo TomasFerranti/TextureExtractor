@@ -27,7 +27,6 @@ body {
 
 #canvasDiv{
   float:left;
-  display: inline-block;
   width: auto;
   height: auto;
   border: 3px solid black;

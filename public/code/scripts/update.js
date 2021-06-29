@@ -5,6 +5,7 @@
 
 // Quando ela é chamada, atualiza todos os elementos do HTML
 function attElementosHTML(){
+
     // Botões guia calibração
     var textoCorreto = (texto) => (texto ? ' ✓' : '');
     document.getElementById('btGuiaX').innerHTML=('Eixo X' + textoCorreto(lastButton == 'X'));
@@ -13,9 +14,15 @@ function attElementosHTML(){
     document.getElementById('btExtrair').innerHTML=('Extrair' + textoCorreto(lastButton == 'extrair'));      
 
     // Botões textura
+    document.getElementById('btNovoPlano').innerHTML=('Novo Plano' + textoCorreto(lastButton == 'novoPlano'));
     document.getElementById('btPlanoYZ').innerHTML=('Plano YZ' + textoCorreto(lastButtonTex == 'YZ'));
     document.getElementById('btPlanoXZ').innerHTML=('Plano XZ' + textoCorreto(lastButtonTex == 'XZ'));
     document.getElementById('btPlanoXY').innerHTML=('Plano XY' + textoCorreto(lastButtonTex == 'XY'));
+
+    // Botões de novos planos
+    for(nome in tiposPlano){
+        tiposPlano[nome]['objeto'].innerHTML=('Plano ' + nome + textoCorreto(lastButtonTex == nome));
+    }
 
     // Imagem
     imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
@@ -38,6 +45,23 @@ function attElementosHTML(){
         for (var i = 0; i < (tam-tam%2)/2; i++) {
             reta(pontosGuia[j][2*i],pontosGuia[j][2*i+1],corLinha[j]);
         }
+    }
+
+    // Pontos do novo plano atual
+    for (var i = 0; i < planoSeg.length; i++){
+        ponto(planoSeg[i].x, planoSeg[i].y, 3, 'violet');
+    }
+
+    // Pontos e Segmentos dos novos planos já adicionados
+    for (nomePlano in tiposPlano){
+        if(['XY','YZ','XZ'].includes(nomePlano)){
+            continue;
+        }
+        var p1 = tiposPlano[nomePlano]['planoSeg'][0];
+        var p2 = tiposPlano[nomePlano]['planoSeg'][1];
+        ponto(p1.x, p1.y, 3, 'violet');
+        ponto(p2.x, p2.y, 3, 'violet');
+        reta(p1, p2, 'violet');
     }
 
     // Pontos da textura

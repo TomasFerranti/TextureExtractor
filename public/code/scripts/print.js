@@ -6,6 +6,8 @@
 // Mostrar resultados da calibração
 function mostrarResultados(){
     var str = 'Clique T para trocar entre o ambiente 2D e 3D. <br/>';
+    str = str + 'Use WASD para mover a posição da câmera. <br/>';
+    str = str + 'Use SETAS para mover o ângulo da câmera. <br/>';
 
     // Fx, Fy e Fz
     var strList = ['Fx','Fy','Fz'];
