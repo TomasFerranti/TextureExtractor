@@ -213,7 +213,6 @@ class Plano {
                     
                     if(arr_igual(pontoDeFuga1, pontoDeFugaCorreto) && arr_igual(pontoDeFuga2, pontoDeFugaCorreto)){
                         flag = true;
-                        console.log('YEP COCK');
                         break;
                     };
                 };
