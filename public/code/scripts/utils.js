@@ -87,10 +87,46 @@ function arredondar(x,n){
 
 // Verificar se dois arrays são iguais
 function arr_igual(a1, a2){
-    if (Math.abs(a1.x-a2.x)+Math.abs(a1.y-a2.y)+Math.abs(a1.z-a2.z) > 0.00001){
-        return false;
+    switch(a1.toArray().length){
+        case 2:
+            if (Math.abs(a1.x-a2.x)+Math.abs(a1.y-a2.y) > 0.00001){
+                return false;
+            }
+            break;
+        case 3:
+            if (Math.abs(a1.x-a2.x)+Math.abs(a1.y-a2.y)+Math.abs(a1.z-a2.z) > 0.00001){
+                return false;
+            }
+            break;
+        default:
+            // pass
     }
     return true;
+}
+
+// Realizar a interpolação bilinear do valor do pixel
+function bilinear_interpolation(pixprojs,pixprojs_rgb,pixproj){
+    // Trocar para vetor
+    for(var k=0; k<4; k++){
+        pixprojs_rgb[k] = criarObjeto([pixprojs_rgb[k][0],pixprojs_rgb[k][1],pixprojs_rgb[k][2]]); 
+    };
+    // Fórmula presente em https://en.wikipedia.org/wiki/Bilinear_interpolation
+    var c, dx1, dx2, dy1, dy2;
+    c = 1/((pixprojs[3]['x']-pixprojs[0]['x'])*(pixprojs[3]['y']-pixprojs[0]['y']));
+    dx1 = pixprojs[3]['x'] - pixproj['x'];
+    dx2 = pixproj['x'] - pixprojs[0]['x'];
+    dy1 = pixprojs[3]['y'] - pixproj['y'];
+    dy2 = pixproj['y'] - pixprojs[0]['y'];
+
+    var vec1, vec2;
+    vec1 = new THREE.Vector2(dx1, dx2);
+    var pixproj_rgb = new THREE.Vector3();
+    for(var coord of ['x','y','z']){
+        vec2 = new THREE.Vector2(dy1*pixprojs_rgb[0][coord] + dy2*pixprojs_rgb[1][coord], 
+                                 dy1*pixprojs_rgb[2][coord] + dy2*pixprojs_rgb[3][coord]);
+        pixproj_rgb[coord] = c * (vec1.dot(vec2));
+    };
+    return pixproj_rgb;
 }
 
 // Calcula a área do triangulo delimitado pelos três pontos no R^2

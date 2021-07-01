@@ -92,6 +92,7 @@ function calc(){
 // Criar um novo tipo de plano a partir da reta origem e eixo paralelo
 var tiposPlano = {};
 var planoSeg = [];
+var coordEixoInd = {'x':0, 'y':1, 'z':2}
 function criarNovoPlano(mouse){
     if(baseXYZ.equals(new THREE.Matrix3())){
         alert('Primeiro se necessita do cálculo da câmera!');
@@ -111,7 +112,10 @@ function criarNovoPlano(mouse){
         novoObjeto.innerText = 'Plano ' + nome;
         var extrairChild = document.getElementById("btExtrair");
         novoObjeto = divPlanos.insertBefore(novoObjeto, extrairChild);
-        tiposPlano[nome] = {'planoSeg':planoSeg, 'eixoPar':eixoPar, 'objeto':novoObjeto};
+
+        var coordInd = coordEixoInd[eixoPar];
+        var Fh = inter_retas(planoSeg[0], planoSeg[1], pontosDeFuga[(coordInd+1)%3], pontosDeFuga[(coordInd+2)%3]);
+        tiposPlano[nome] = {'planoSeg':planoSeg, 'pontoDeFuga':Fh, 'eixoPar':eixoPar, 'objeto':novoObjeto};
         planoSeg = []
     }
 }
@@ -122,13 +126,13 @@ var coordFuga = {'XZ':0,'YZ':1,'XY':1}
 function adicionarDadosPlanosOrts(){
     for(nome in coordEixo){
         tiposPlano[nome] = {'planoSeg':[pontosGuia[coordFuga[nome]][0],pontosGuia[coordFuga[nome]][1]], 
+                            'pontoDeFuga':pontosDeFuga[coordFuga[nome]], 
                             'eixoPar':coordEixo[nome], 
                             'objeto':document.getElementById('btPlano'+nome)};
     }
 }
 
 var coordDic = {'YZ':'x','XZ':'y','XY':'z'};
-var coordEixoInd = {'x':0, 'y':1, 'z':2}
 // Classe criada para representar os planos
 class Plano {
     // v são os pontos do canvas 2D e P os pontos no espaço 3D
@@ -146,11 +150,8 @@ class Plano {
                      desprojetarTela(v[2].clone(),lastButtonTex,1), 
                      0]; 
         }else{
-            var coordInd = coordEixoInd[tiposPlano[lastButtonTex]['eixoPar']];
-            var h1 = tiposPlano[lastButtonTex]['planoSeg'][0];
-            var h2 = tiposPlano[lastButtonTex]['planoSeg'][1];
-            var Fh = inter_retas(h1, h2, pontosDeFuga[(coordInd+1)%3], pontosDeFuga[(coordInd+2)%3]);
-            Fh = desprojetarTela(Fh,null,null)
+            var Fh = tiposPlano[lastButtonTex]['pontoDeFuga'];
+            Fh = desprojetarTela(Fh,null,null);
             var pontoDoPlano = planos[indPlano].P[indSeg];
             var eixo = tiposPlano[lastButtonTex]['eixoPar'];
             var P = [desprojetarTela2(v[0].clone(),Fh,pontoDoPlano,eixo), 
@@ -165,41 +166,6 @@ class Plano {
         this.obterPontos();
     }
 
-    // Fornece os índices dos pontos para cálculo posterior
-    obterIndice(){
-        var casoBase = {'YZ':[1,['x','y']], 'XZ':[1,['x','y']] ,'XY':[1,['z']]};
-        if(this.indPlanoCon==null){
-            return casoBase[this.tipoPlano];
-        }
-
-        
-        // retorna [indice P0, ]
-        var eixoParPlano1 = tiposPlano[this.tipoPlano]['eixoPar'];
-        var eixoParPlano2 = tiposPlano[planos[this.indPlanoCon].tipoPlano]['eixoPar'];
-        var seg = this.indSegCon;
-
-        // Eixo do plano atual, eixo do plano conectado, segmento conectado
-        // Novo índice do primeiro ponto do segmento, coordenadas do ponto auxiliar
-        var casos = [
-                    ['z','z',0,3,['x','y']], ['z','z',2,1,['x','y']], ['z','z',1,0,['z']], ['z','z',3,2,['z']],         // 'z' para 'z'
-                    ['y','y',0,3,['y']], ['y','y',2,1,['y']], ['y','y',1,0,['x','z']], ['y','y',3,2,['x','z']],         // 'y' para 'y'
-                    ['x','x',0,3,['y','z']], ['x','x',2,1,['y','z']], ['x','x',1,0,['x']], ['x','x',3,2,['x']],         // 'x' para 'x'
-                    ['x','z',3,1,['y','z']], ['x','z',1,3,['y','z']], ['y','z',3,0,['x','z']], ['y','z',1,2,['x','z']], // 'z' para resto
-                    ['z','y',0,3,['z']], ['z','y',2,1,['z']],         // 'y' para resto
-                    ['z','x',1,3,['z']], ['z','x',3,1,['z']]          // 'x' para resto
-                    ];
-
-        console.log("Plano",planos.length);
-        console.log(eixoParPlano1, eixoParPlano2, seg);
-        
-        for(var j=0; j<casos.length; j++){
-            var caso = casos[j];
-            if(eixoParPlano1==caso[0] && eixoParPlano2==caso[1] && seg==caso[2]){
-                return [caso[3],caso[4]];
-            }
-        };
-    }
-
     // Obtém o restante dos pontos na tela e no espaço
     obterPontos(){
         // Pontos de orientação
@@ -208,31 +174,72 @@ class Plano {
 
         for(var j=0; j<4;j++){
             this.P.push(new THREE.Vector3());
-        }
-
-        // Corrigir orientação
-        var [indP0, coordsAux] = this.obterIndice();
-        indP0 = indP0 + 4;
+        };
 
         // Pondo os dois pontos iniciais na posição correta
         if(this.indPlanoCon==null){
-            this.P[(indP0-1)%4] = subP[0].clone();
-            this.P[indP0%4] = subP[1].clone();
+            this.P[0] = subP[0].clone();
+            this.P[1] = subP[1].clone();
         }else{
-            this.P[indP0%4] = subP[0].clone();
-            this.P[(indP0-1)%4] = subP[1].clone();
+            this.P[1] = subP[0].clone();
+            this.P[0] = subP[1].clone();
         };
 
         // Preenchendo a posição dos outros dois pontos dependendo de quais coordenadas do ponto auxiliar
-        for(var coord of ['x','y','z']){
-            if (coordsAux.includes(coord)){
-                this.P[(indP0+1)%4][coord] = subP[2][coord];
-                this.P[(indP0+2)%4][coord] = subP[2][coord];
-            }else{
-                this.P[(indP0+1)%4][coord] = this.P[(indP0)%4][coord];
-                this.P[(indP0+2)%4][coord] = this.P[(indP0-1)%4][coord];
+        var possibleCoords = [['x'],['y'],['z'],['x','y'],['x','z'],['y','z']];
+        for(var coordsAux of possibleCoords){
+            for(var coord of ['x','y','z']){
+                if (coordsAux.includes(coord)){
+                    this.P[2][coord] = subP[2][coord];
+                    this.P[3][coord] = subP[2][coord];
+                }else{
+                    this.P[2][coord] = this.P[1][coord];
+                    this.P[3][coord] = this.P[0][coord];
+                }
             }
-        }
+            var P = criarCopia(this.P);
+            var a,b,c,d;
+            var flag = false;
+            // Testa se há pontos iguais
+            if(!(arr_igual(P[0],P[2]) || arr_igual(P[0],P[3]) || arr_igual(P[1],P[2]) || arr_igual(P[1],P[3]) || arr_igual(P[2],P[3]))){
+                // Testa se o ponto de fuga corresponde ao do plano
+                var coordInd = coordEixoInd[tiposPlano[this.tipoPlano]['eixoPar']];
+                var pontoDeFugaCorreto = tiposPlano[this.tipoPlano]['pontoDeFuga'];
+
+                for(var j=0; j<4; j++){
+                    [a,b,c,d] = [P[j%4],P[(j+3)%4],P[(j+1)%4],P[(j+2)%4]];
+                    var pontoDeFuga1 = inter_retas(projetarTela(a),projetarTela(b), pontosDeFuga[(coordInd+1)%3], pontosDeFuga[(coordInd+2)%3]);
+                    var pontoDeFuga2 = inter_retas(projetarTela(c),projetarTela(d), pontosDeFuga[(coordInd+1)%3], pontosDeFuga[(coordInd+2)%3]);
+                    
+                    if(arr_igual(pontoDeFuga1, pontoDeFugaCorreto) && arr_igual(pontoDeFuga2, pontoDeFugaCorreto)){
+                        flag = true;
+                        console.log('YEP COCK');
+                        break;
+                    };
+                };
+            };
+            if(flag){
+                break;
+            };
+        };
+
+        // Corrigir índices dos pontos
+        if(this.indPlanoCon!=null){
+            var segInd = this.indSegCon;
+            switch(segInd){
+                case 0:
+                    this.P = [this.P[2], this.P[3], this.P[0], this.P[1]];
+                    break;
+                case 1:
+                    this.P = [this.P[1], this.P[2], this.P[3], this.P[0]];
+                    break;
+                case 3:
+                    this.P = [this.P[3], this.P[0], this.P[1], this.P[2]];
+                    break;
+                default:
+                    // pass
+            }
+        };
 
         // Atualizar posição deles na tela
         for(var j=0; j<4; j++){
@@ -262,8 +269,9 @@ class Plano {
             var w = arredondar(h/a,0);   
         }            
 
-        var curpix, pixprojs, pixproj, pixrgb, pos, curdist, totaldist, rgba;
-        var dt = P[2].clone().subVectors(P[2],P[0]);
+        var curpix, pixprojs, pixproj, pix_rgb, pos, pixprojs_rgb;
+        var dt1 = P[3].clone().subVectors(P[3],P[0]);
+        var dt2 = P[1].clone().subVectors(P[1],P[0]);
 
         // Criar o buffer da imagem que irá receber os dados dos pixels. Variável in place
         var imgData = criarImagem(w,h);
@@ -273,49 +281,31 @@ class Plano {
         // Preenchendo os dados da imagem para depois desenhar
         for (var i = 0; i < h; i++) {
             for (var j = 0; j < w; j++) {
-                // A direção para onde os pixels andam depende do eixo paralelo
-                switch(tiposPlano[this.tipoPlano]['eixoPar']){
-                    case 'z':
-                        curdt['x'] = dt.x*i/h;
-                        curdt['y'] = dt.y*i/h;
-                        curdt['z'] = dt.z*j/w;
-                        break;
-                    case 'y':
-                        curdt['x'] = dt.x*i/h;
-                        curdt['y'] = dt.y*j/w;
-                        curdt['z'] = dt.z*i/h;
-                        break;
-                    case 'x':
-                        curdt['x'] = dt.x*j/w;
-                        curdt['y'] = dt.y*i/h;
-                        curdt['z'] = dt.z*i/h;  
-                        break;  
-                }
+                // A direção para onde os pixels andam
+                curdt['x'] = dt1.x*i/h + dt2.x*j/w;
+                curdt['y'] = dt1.y*i/h + dt2.y*j/w;
+                curdt['z'] = dt1.z*i/h + dt2.z*j/w;
                 curpix = P[0].clone().addVectors(P[0],curdt);
+
                 pixproj = projetarTela(curpix);
                 pixprojs = [];
                 pixprojs.push(criarObjeto([Math.floor(pixproj['x']),Math.floor(pixproj['y'])]));
                 pixprojs.push(criarObjeto([Math.floor(pixproj['x']),Math.ceil(pixproj['y'])]));
                 pixprojs.push(criarObjeto([Math.ceil(pixproj['x']),Math.floor(pixproj['y'])]));
                 pixprojs.push(criarObjeto([Math.ceil(pixproj['x']),Math.ceil(pixproj['y'])]));
-                totaldist = 0;
-                for(var pix of pixprojs){
-                    totaldist = totaldist + 1/(1+pixproj.clone().subVectors(pixproj, pix).length());
+                
+                pixprojs_rgb = [];
+                for(var k=0; k<4; k++){
+                    pixprojs_rgb.push(imgCtxSec.getImageData(pixprojs[k]['x'],pixprojs[k]['y'],1,1).data);
                 };
-                rgba = [0,0,0,0];
-                for(var pix of pixprojs){
-                    pixrgb = imgCtxSec.getImageData(pix['x'],pix['y'],1,1).data;
-                    curdist = 1/((1+pixproj.clone().subVectors(pixproj, pix).length())*totaldist);
-                    rgba[0] = rgba[0] + pixrgb[0]*curdist;
-                    rgba[1] = rgba[1] + pixrgb[1]*curdist;
-                    rgba[2] = rgba[2] + pixrgb[2]*curdist;
-                    rgba[3] = rgba[3] + pixrgb[3]*curdist;
-                };
+
+                pix_rgb = bilinear_interpolation(pixprojs,pixprojs_rgb,pixproj);
+
                 pos = 4*(i*w + j);
-                buffer[pos] = rgba[0];
-                buffer[pos+1] = rgba[1];
-                buffer[pos+2] = rgba[2];
-                buffer[pos+3] = rgba[3];
+                buffer[pos] = pix_rgb['x'];
+                buffer[pos+1] = pix_rgb['y'];
+                buffer[pos+2] = pix_rgb['z'];
+                buffer[pos+3] = 255;
             }
         }
 
@@ -356,11 +346,6 @@ function extrairTextura(mouse){
         default:
             // Adiciona o novo ponto
             pontosExtrair.push(mouse);
-
-            // Atualizar profundidade
-            //if(planos.length!=0){
-            //    ultimaProf = planos[indPlano].P[indSeg][coordDic[lastButtonTex]];
-            //}
 
             // Obter os outros pontos e a textura através da classe Plano
             var novoPlano = new Plano(indPlano,indSeg); 
