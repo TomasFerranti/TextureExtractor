@@ -3,7 +3,7 @@
 // -----------------------
 // ÚTEIS AO JAVASCRIPT
 
-// Cria um cópia de um array (JS) de arrays (numjs) para acabar com possíveis referências indesejadas
+// Criar uma cópia de um array (JS) de vectors (numjs) para acabar com possíveis referências indesejadas
 function criarCopia(arr){
     var novoArr = [];
     for (var i = 0; i < arr.length; i++) {
@@ -16,7 +16,7 @@ function criarCopia(arr){
     return novoArr;
 }
 
-// Criar um objeto imagedata para a texturar a partir do buffer
+// Criar um objeto imagedata para a textura a partir do buffer
 function criarImagem(w,h){
     // Criar o elemento escondido da imagem da textura a ser preenchida
     var canvasEscondido = document.createElement('canvas');
@@ -85,7 +85,7 @@ function arredondar(x,n){
     return (Math.round((10**n)*x)/(10**n));
 }
 
-// Verificar se dois arrays são iguais
+// Verificar se dois vetores são iguais com uma margem de 0.00001
 function arr_igual(a1, a2){
     switch(a1.toArray().length){
         case 2:
@@ -104,7 +104,7 @@ function arr_igual(a1, a2){
     return true;
 }
 
-// Realizar a interpolação bilinear do valor do pixel
+// Realizar a interpolação bilinear do valor do pixel para cada coordenada
 function bilinear_interpolation(pixprojs,pixprojs_rgb,pixproj){
     // Trocar para vetor
     for(var k=0; k<4; k++){
@@ -183,8 +183,8 @@ function desprojetarTela(vector,plano,prof) {
             // pass
     }
     return(Q);
-}
-  
+};
+
 // Projeta um 'vector' do sistema de coordenadas do espaço na tela
 function projetarTela(vector){
     var Q = vector.clone().applyMatrix3(baseXYZ);
@@ -194,7 +194,7 @@ function projetarTela(vector){
     return(Q); 
 }
 
-// Dado um ponto e um segmento de reta (definido por dois pontos), calcula a distância
+// Dado um ponto e um segmento de reta (definido por dois pontos), calcula a distância minima entre estes
 function distanciaSegmento(x,y,x1,y1,x2,y2){
     var A = x - x1;
     var B = y - y1;
@@ -222,7 +222,7 @@ function distanciaSegmento(x,y,x1,y1,x2,y2){
     return Math.sqrt(dx * dx + dy * dy);
 }
 
-// Obtém os dois pontos pertencentes aos segmentos mais próximos do mouse
+// Obtém os dois indices: do plano e do segmento pertencentes ao segmento mais próximo do mouse
 function segmentoMaisProximo(mouse){
     var ci, cj, cd;
     var dist = 20000;

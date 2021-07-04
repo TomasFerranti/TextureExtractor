@@ -9,7 +9,7 @@ var C = new THREE.Vector3();
 var baseXYZ = new THREE.Matrix3();
 var CO = new THREE.Vector2();
 
-// Função chamada quando se pede o cálculo
+// Função chamada quando se pede o cálculo da calibração da câmera 
 function calc(){
     // Número de pontos guias insuficientes
     if (pontosGuia[0].length < 4 || pontosGuia[1].length < 4 || pontosGuia[2].length < 4){
@@ -80,7 +80,11 @@ function calc(){
     baseXYZ.elements = [X.x, X.y, X.z, Y.x, Y.y, Y.z, Z.x, Z.y, Z.z];
 
     statusCalibracao = 'calculada';
+
+    // Adicionar os planos XY, YZ e XZ como tipos de planos
     adicionarDadosPlanosOrts();
+
+    // Mostrar resultados na tela no prompt à direita
     mostrarResultados();
 }
 // -----------------------
@@ -89,8 +93,9 @@ function calc(){
 // -----------------------
 // EXTRAÇÃO DA TEXTURA
 
-// Criar um novo tipo de plano a partir da reta origem e eixo paralelo
+// Criar um novo tipo de plano a partir do segmento paralelo e eixo paralelo
 var tiposPlano = {};
+// Guardar os pontos em planoSeg
 var planoSeg = [];
 var coordEixoInd = {'x':0, 'y':1, 'z':2}
 function criarNovoPlano(mouse){
@@ -100,6 +105,7 @@ function criarNovoPlano(mouse){
     }
     planoSeg.push(mouse);
     if (planoSeg.length == 2){
+        // Coletar dados do plano e criar seu objeto
         var nome = prompt('Insira o nome do novo tipo de plano');
         var eixoPar = prompt('Insira o eixo paralelo a esse plano ("x","y","z")');
         var divPlanos = document.getElementById('planos');
@@ -113,6 +119,7 @@ function criarNovoPlano(mouse){
         var extrairChild = document.getElementById("btExtrair");
         novoObjeto = divPlanos.insertBefore(novoObjeto, extrairChild);
 
+        // Calcular seu ponto de fuga e armazená-lo
         var coordInd = coordEixoInd[eixoPar];
         var Fh = inter_retas(planoSeg[0], planoSeg[1], pontosDeFuga[(coordInd+1)%3], pontosDeFuga[(coordInd+2)%3]);
         tiposPlano[nome] = {'planoSeg':planoSeg, 'pontoDeFuga':Fh, 'eixoPar':eixoPar, 'objeto':novoObjeto};
@@ -135,15 +142,18 @@ function adicionarDadosPlanosOrts(){
 var coordDic = {'YZ':'x','XZ':'y','XY':'z'};
 // Classe criada para representar os planos
 class Plano {
-    // v são os pontos do canvas 2D e P os pontos no espaço 3D
-    // O array P possui três pontos inicialmente: dois de orientação do plano anterior e um para extensão
+    // Chamado na instanciação
     constructor(indPlano,indSeg) {
+        // Atributos iniciais
         this.indPlanoCon = indPlano;
         this.indSegCon = indSeg;
         this.tipoPlano = lastButtonTex;
 
+        // v são os pontos do canvas 2D
         var v = [pontosExtrair[0], pontosExtrair[1], pontosExtrair[2], 0];
 
+        // P são os pontos no espaço 3D, caso seja o primeiro plano desprojetar normalmente
+        // Caso não, desprojetar pelo eixo paralelo
         if(indPlano==null){
             var P = [desprojetarTela(v[0].clone(),lastButtonTex,1), 
                      desprojetarTela(v[1].clone(),lastButtonTex,1), 
@@ -159,19 +169,22 @@ class Plano {
                      desprojetarTela2(v[2].clone(),Fh,pontoDoPlano,eixo), 
                      0]; 
         }
-        
-        
+
+        // Atribuir à classe
         this.v = criarCopia(v);
         this.P = criarCopia(P);
+
+        // Terminar de preencher os pontos
         this.obterPontos();
     }
 
     // Obtém o restante dos pontos na tela e no espaço
     obterPontos(){
-        // Pontos de orientação
+        // Preencher P corretamente
         var subP = criarCopia(this.P);
         this.P = [];
 
+        // Vetores 3D
         for(var j=0; j<4;j++){
             this.P.push(new THREE.Vector3());
         };
@@ -186,8 +199,10 @@ class Plano {
         };
 
         // Preenchendo a posição dos outros dois pontos dependendo de quais coordenadas do ponto auxiliar
+        // Testando todas as possíveis coordenadas dos dois pontos restantes de modo a projeção intersectar o ponto de fuga
         var possibleCoords = [['x'],['y'],['z'],['x','y'],['x','z'],['y','z']];
         for(var coordsAux of possibleCoords){
+            // Preencher os dois últimos pontos
             for(var coord of ['x','y','z']){
                 if (coordsAux.includes(coord)){
                     this.P[2][coord] = subP[2][coord];
@@ -197,9 +212,11 @@ class Plano {
                     this.P[3][coord] = this.P[0][coord];
                 }
             }
+            // Verificar projeção
             var P = criarCopia(this.P);
             var a,b,c,d;
             var flag = false;
+
             // Testa se há pontos iguais
             if(!(arr_igual(P[0],P[2]) || arr_igual(P[0],P[3]) || arr_igual(P[1],P[2]) || arr_igual(P[1],P[3]) || arr_igual(P[2],P[3]))){
                 // Testa se o ponto de fuga corresponde ao do plano
@@ -217,12 +234,13 @@ class Plano {
                     };
                 };
             };
+            // Caso tenha encontrado, parar de procurar
             if(flag){
                 break;
             };
         };
 
-        // Corrigir índices dos pontos
+        // Corrigir índices dos pontos dado o segmento conectado
         if(this.indPlanoCon!=null){
             var segInd = this.indSegCon;
             switch(segInd){
@@ -286,6 +304,8 @@ class Plano {
                 curdt['z'] = dt1.z*i/h + dt2.z*j/w;
                 curpix = P[0].clone().addVectors(P[0],curdt);
 
+                // Criar os objetos para interpolação bilinear
+                // Quatro pixels e seus valores em pixprojs e pixprojs_rgb, enquanto pixproj corresponde ao nosso ponto
                 pixproj = projetarTela(curpix);
                 pixprojs = [];
                 pixprojs.push(criarObjeto([Math.floor(pixproj['x']),Math.floor(pixproj['y'])]));
@@ -298,8 +318,8 @@ class Plano {
                     pixprojs_rgb.push(imgCtxSec.getImageData(pixprojs[k]['x'],pixprojs[k]['y'],1,1).data);
                 };
 
+                // Interpolar e preencher
                 pix_rgb = bilinear_interpolation(pixprojs,pixprojs_rgb,pixproj);
-
                 pos = 4*(i*w + j);
                 buffer[pos] = pix_rgb['x'];
                 buffer[pos+1] = pix_rgb['y'];
@@ -321,15 +341,15 @@ imgCanvasSec.height = imgCanvas.height;
 
 // Variáveis globais do canvas da textura
 var planos = [];
-//var ultimaProf = 1;
 var indPlano, indSeg;
+
 // Função chamada quando se clica no canvas com extrair selecionado
 function extrairTextura(mouse){
     // Caso não tenha o cálculo da câmera
     if(baseXYZ.equals(new THREE.Matrix3())){
         alert('Primeiro se necessita do cálculo da câmera!');
         return;
-    }
+    };
 
     // Para cada quantidade de pontos já selecionada
     switch (pontosExtrair.length){
@@ -356,6 +376,6 @@ function extrairTextura(mouse){
 
             // Atualizar pontosExtrair para receber próximos pontos
             pontosExtrair = [];
-    }
+    };
 }
 // -----------------------

@@ -18,6 +18,7 @@ function salvarJson() {
         return;
     }
 
+    // Salvar pontos guia em um formato de leitura aceitável
     var pontosGuiaData = []
     for(var j=0; j<3; j++){
         pontosGuiaData.push([])
@@ -26,6 +27,7 @@ function salvarJson() {
         }
     }
 
+    // Dados salvos no .json
     var data = {'imagem':imgCanvasSec.toDataURL(),
                 'pontosguia':pontosGuiaData,
                 'pontosfuga':[pontosDeFuga[0].toArray(),pontosDeFuga[1].toArray(),pontosDeFuga[2].toArray()],
@@ -62,6 +64,7 @@ function carregarJson(){
         if (err) {
             alert('failed to load: ' + filename + '\n' + err);
         } else {
+            // Carregar os dados nas respectivas variáveis
             limparTodasVar();
             data = JSON.parse(data);
             baseXYZ = criarObjeto(data.base);
@@ -77,6 +80,8 @@ function carregarJson(){
             };
             imgImagem.src = data.imagem;
             statusCalibracao = 'carregada';
+
+            // Atualizar as variáveis gerais
             adicionarDadosPlanosOrts();
             mostrarResultados();
             iniciar();

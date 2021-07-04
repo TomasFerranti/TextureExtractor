@@ -22,7 +22,7 @@ function iniciar(){
     // Renderizar cena pela primeira vez
     renderizador.render(cena, camera);
 
-    // Pacote que permite controle da câmera do tipo "Órbita"
+    // Permite controle da câmera do tipo "Órbita"
     controles = new THREE.FlyControls( camera, renderizador.domElement );
     
     // Configurações desse controle
@@ -99,16 +99,19 @@ function onWindowResize() {
 }
 window.addEventListener('resize', onWindowResize, false);
 
-// ATUALIZA CÂMERA
+// Atualiza posição e rotação da câmera quando se adiciona um novo plano
 function atualizaCamera(){
+    // Determina o plano
     var ultimoPlano = planos[planos.length-1];
     
+    // Calcula o centro
     var centro = new THREE.Vector3();
     for(var j=0; j<4; j++){
         centro.addVectors(centro,ultimoPlano.P[j]);
     }
     centro.multiplyScalar(1/4);
 
+    // Calcula a distancia
     var maxDist = centro.clone().subVectors(centro,planos[0].P[0]).length();
     var curDist;
     for(var j=0; j<planos.length; j++){
@@ -117,10 +120,17 @@ function atualizaCamera(){
         } 
     }
 
+    // Calcula o normal
     var v1 = ultimoPlano.P[0].clone().subVectors(ultimoPlano.P[1],ultimoPlano.P[0]);
     var v2 = ultimoPlano.P[0].clone().subVectors(ultimoPlano.P[3],ultimoPlano.P[0]);
     var normalPlano = v1.clone().crossVectors(v1,v2);
     normalPlano.multiplyScalar(3/2*maxDist/normalPlano.length());
+    // Inverte caso ponto de fuga de 'z' se encontre abaixo
+    if(pontosDeFuga[2]['y']>=0){
+        normalPlano.multiplyScalar(-1);
+    }
+
+    // Cria o vetor de posição da câmera e o atribui ao objeto
     var posCamera = centro.clone().addVectors(centro,normalPlano);
     
     camera.position.x = posCamera.x;
@@ -128,10 +138,15 @@ function atualizaCamera(){
     camera.position.z = posCamera.z;
     camera.lookAt(centro.x,centro.y,centro.z);
 
+    // Cria os angulos de rotação da camera e atribui ao objeto
     var angulos = camera.rotation.toVector3();
     if(tiposPlano[ultimoPlano['tipoPlano']]['eixoPar'] == 'z'){
         angulos.x = Math.PI/2;
         angulos.z = 0;
+    }
+    // Rotacione caso ponto de fuga de 'z' se encontre abaixo
+    if(pontosDeFuga[2]['y']>=0){
+        angulos.z = Math.PI;
     }
     camera.rotation.setFromVector3(angulos);
 }

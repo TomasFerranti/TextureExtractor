@@ -3,6 +3,7 @@
 // -----------------------
 // CARREGAMENTO DE IMAGENS
 
+// Elementos dos canvas
 var imgCanvas = document.getElementById('imagemCanvas');
 var imgCtx = imgCanvas.getContext('2d');
 
@@ -13,6 +14,7 @@ imgImagem.crossOrigin = '';
 // Imagem padrão
 imgImagem.src = 'images/ex1.png';
 
+// Troca de imagem
 imgImagem.onload = function(){
 	imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
 	imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
@@ -30,6 +32,7 @@ imgImagem.onload = function(){
 
 // -----------------------
 // ENTRADA DE BOTÕES
+// Grande parte dessas funções estão atribuídas no elemento HTML manualmente
 
 function carregarImagemWeb() {
 	x = prompt('Por favor insira a URL da imagem desejada.');
