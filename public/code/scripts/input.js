@@ -35,7 +35,7 @@ imgImagem.onload = function(){
 // Grande parte dessas funções estão atribuídas no elemento HTML manualmente
 
 function carregarImagemWeb() {
-	x = prompt('Por favor insira a URL da imagem desejada.');
+	x = prompt('Insert the URL of the desired image!');
 	imgImagem.src = x;
 	limparTodasVar();
 	attElementosHTML();
@@ -106,7 +106,7 @@ imgCanvas.addEventListener('click', function (e) {
 
 	// Caso esteja fazendo outra coisa depois de criar um novo plano
 	if ((planoSeg.length > 0) && (lastButton != 'novoPlano')){
-		alert('Por favor termine de escolher os vértices do novo plano antes de usar outra ferramenta!');
+		alert('Finish the segment points of the new plane before using another tool!');
 		attElementosHTML();
 		return;
 	}
@@ -141,7 +141,7 @@ var curCanvas = '2d';
 document.addEventListener("keyup", function(event) {	
 	if(event.keyCode == 84){
 		if(statusCalibracao == 'naoCalculada'){
-			alert('Calibre a câmera primeiro!');
+			alert('Camera calibration is needed!');
 			return;
 		}
 		if(curCanvas == '2d'){

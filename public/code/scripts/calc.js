@@ -13,12 +13,12 @@ var CO = new THREE.Vector2();
 function calc(){
     // Número de pontos guias insuficientes
     if (pontosGuia[0].length < 4 || pontosGuia[1].length < 4 || pontosGuia[2].length < 4){
-        alert('Por favor selecione dois segmentos para cada eixo!');
+        alert('Please choose two or more segments for each axis!');
         return;
     }
     // Número de pontos guias ímpares para alguma dimensão (pontos soltos)
     if (pontosGuia[0].length % 2 == 1 || pontosGuia[1].length % 2 == 1 || pontosGuia[2].length % 2 == 1){
-        alert('Por favor complete os pontos restantes!');
+        alert('Please finish the remaining segment points of the calibration!');
         return;
     }
 
@@ -100,14 +100,14 @@ var planoSeg = [];
 var coordEixoInd = {'x':0, 'y':1, 'z':2}
 function criarNovoPlano(mouse){
     if(baseXYZ.equals(new THREE.Matrix3())){
-        alert('Primeiro se necessita do cálculo da câmera!');
+        alert('Camera calibration is needed!');
         return;
     }
     planoSeg.push(mouse);
     if (planoSeg.length == 2){
         // Coletar dados do plano e criar seu objeto
-        var nome = prompt('Insira o nome do novo tipo de plano');
-        var eixoPar = prompt('Insira o eixo paralelo a esse plano ("x","y","z")');
+        var nome = prompt('Insert the new plane type name!');
+        var eixoPar = prompt('Insert the parallel axis to this plane (x,y or z)!');
         var divPlanos = document.getElementById('planos');
         var novoObjeto = document.createElement('a');
         novoObjeto.onclick = function (){
@@ -154,21 +154,19 @@ class Plano {
 
         // P são os pontos no espaço 3D, caso seja o primeiro plano desprojetar normalmente
         // Caso não, desprojetar pelo eixo paralelo
+        var pontoDoPlano;
         if(indPlano==null){
-            var P = [desprojetarTela(v[0].clone(),lastButtonTex,1), 
-                     desprojetarTela(v[1].clone(),lastButtonTex,1), 
-                     desprojetarTela(v[2].clone(),lastButtonTex,1), 
-                     0]; 
+            pontoDoPlano = new THREE.Vector3(1,1,1);
         }else{
-            var Fh = tiposPlano[lastButtonTex]['pontoDeFuga'];
-            Fh = desprojetarTela(Fh,null,null);
-            var pontoDoPlano = planos[indPlano].P[indSeg];
-            var eixo = tiposPlano[lastButtonTex]['eixoPar'];
-            var P = [desprojetarTela2(v[0].clone(),Fh,pontoDoPlano,eixo), 
-                     desprojetarTela2(v[1].clone(),Fh,pontoDoPlano,eixo), 
-                     desprojetarTela2(v[2].clone(),Fh,pontoDoPlano,eixo), 
-                     0]; 
-        }
+            pontoDoPlano = planos[indPlano].P[indSeg];
+        };
+        var Fh = tiposPlano[lastButtonTex]['pontoDeFuga'];
+        Fh = desprojetarTela(Fh,null,null);
+        var eixo = tiposPlano[lastButtonTex]['eixoPar'];
+        var P = [desprojetarTela2(v[0].clone(),Fh,pontoDoPlano,eixo), 
+                    desprojetarTela2(v[1].clone(),Fh,pontoDoPlano,eixo), 
+                    desprojetarTela2(v[2].clone(),Fh,pontoDoPlano,eixo), 
+                    0]; 
 
         // Atribuir à classe
         this.v = criarCopia(v);
@@ -347,7 +345,7 @@ var indPlano, indSeg;
 function extrairTextura(mouse){
     // Caso não tenha o cálculo da câmera
     if(baseXYZ.equals(new THREE.Matrix3())){
-        alert('Primeiro se necessita do cálculo da câmera!');
+        alert('Camera calibration is needed!');
         return;
     };
 

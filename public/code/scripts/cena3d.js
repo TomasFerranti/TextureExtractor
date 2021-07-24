@@ -13,10 +13,11 @@ function iniciar(){
     camera = new THREE.PerspectiveCamera(
         75, // FOV
         texCanvas.width/texCanvas.height, // Aspect
-        0.1, // Near
+        0.001, // Near
         1000 // Far
     );
-    renderizador = new THREE.WebGLRenderer({ canvas: texCanvas });
+    renderizador = new THREE.WebGLRenderer({canvas: texCanvas, 
+                                            preserveDrawingBuffer: true  });
     renderizador.setSize(texCanvas.width,texCanvas.height);
     
     // Renderizar cena pela primeira vez
@@ -118,6 +119,9 @@ function atualizaCamera(){
         for(var i=0; i<4; i++){
             curDist = centro.clone().subVectors(centro,planos[j].P[i]).length();
         } 
+        if(curDist > maxDist){
+            maxDist = curDist;
+        }
     }
 
     // Calcula o normal

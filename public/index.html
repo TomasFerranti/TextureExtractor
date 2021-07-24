@@ -3,7 +3,7 @@
     <meta content='text/html;charset=utf-8' http-equiv='Content-Type'>
     <meta content='utf-8' http-equiv='encoding'>
 
-    <title> Projeto ImagineRio </title>
+    <title> Project Texture Extractor </title>
 
     <link rel='stylesheet' href='code/style.css'>
 </head>
@@ -12,31 +12,32 @@
     <div id='universo'>
         <div id='controles'>
             <div class='dropdown'>
-                <button class='dropdown-bt'>Arquivo</button>
+                <button class='dropdown-bt'>Files</button>
                 <div class='dropdown-conteudo'>
-                  <a href='javascript:carregarImagemWeb()'>Carregar Imagem (web)</a>
-                  <a href='javascript:carregarImagemLocal()'>Carregar Imagem (local)</a>
+                  <a href='javascript:carregarImagemWeb()'>Load Image (web)</a>
+                  <a href='javascript:carregarImagemLocal()'>Load Image (local)</a>
+                  <a href='javascript:baixarImagem()'>Download Image (canvas)</a>
                 </div>
             </div>
             <div class='dropdown'>
-                <button class='dropdown-bt'>Calibração</button>
+                <button class='dropdown-bt'>Calibration</button>
                 <div class='dropdown-conteudo'>
-                  <a id='btGuiaX' href='javascript:guiaX()'>Eixo X</a>
-                  <a id='btGuiaY' href='javascript:guiaY()'>Eixo Y</a>
-                  <a id='btGuiaZ' href='javascript:guiaZ()'>Eixo Z</a>
-                  <a href='javascript:calcularCam()'>Calcular</a>
-                  <a href='javascript:salvarJson()'>Salvar Calibração (.json)</a>
-                  <a href='javascript:carregarJson()'>Carregar Calibração (.json)</a>
+                  <a id='btGuiaX' href='javascript:guiaX()'>Axis X</a>
+                  <a id='btGuiaY' href='javascript:guiaY()'>Axis Y</a>
+                  <a id='btGuiaZ' href='javascript:guiaZ()'>Axis Z</a>
+                  <a href='javascript:calcularCam()'>Calibrate</a>
+                  <a href='javascript:salvarJson()'>Save Calibration (.json)</a>
+                  <a href='javascript:carregarJson()'>Load Calibration (.json)</a>
                 </div>
             </div>
             <div class='dropdown'>
-                <button class='dropdown-bt'>Extração</button>
+                <button class='dropdown-bt'>Extraction</button>
                 <div class='dropdown-conteudo' id='planos'>
-                  <a id='btNovoPlano' href='javascript:botaoNovoPlano()'>Novo Plano</a>
-                  <a id='btPlanoYZ' href='javascript:botaoPlanoYZ()'>Plano YZ</a>
-                  <a id='btPlanoXZ' href='javascript:botaoPlanoXZ()'>Plano XZ</a>
-                  <a id='btPlanoXY' href='javascript:botaoPlanoXY()'>Plano XY</a>
-                  <a id='btExtrair' href='javascript:botaoExtrairTextura()'>Extrair</a>
+                  <a id='btNovoPlano' href='javascript:botaoNovoPlano()'>New Plane Type</a>
+                  <a id='btPlanoYZ' href='javascript:botaoPlanoYZ()'>Plane YZ</a>
+                  <a id='btPlanoXZ' href='javascript:botaoPlanoXZ()'>Plane XZ</a>
+                  <a id='btPlanoXY' href='javascript:botaoPlanoXY()'>Plane XY</a>
+                  <a id='btExtrair' href='javascript:botaoExtrairTextura()'>Extract</a>
                 </div>
             </div>            
         </div>
@@ -46,7 +47,7 @@
                 <canvas id = 'imagemCanvas' height='800' width='1200'></canvas>   
             </div>            
             <div id='textDiv'>
-                <span id ='output'> Realize o cálculo da câmera para <br/> as variáveis aparecerem aqui. </span>    
+                <span id ='output'> Camera calibration is needed <br/> for variables to show up. </span>    
             </div>
         </div>
     </div>

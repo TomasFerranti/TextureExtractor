@@ -5,16 +5,16 @@
 
 // Salvar calibração
 function salvarJson() {
-    var filename = prompt('Digite o nome do arquivo:');
+    var filename = prompt('Insert file name:');
     filename = 'calib/' + filename;
     if (filename == ''){
-        alert('Coloque um nome não vazio!');
+        alert('Empty name not valid!');
         return;
     }
     filename += '.json';
 
     if (baseXYZ.equals(new THREE.Matrix3())){
-        alert('Calibre a câmera antes de salvar!');
+        alert('Camera calibration is needed!');
         return;
     }
 
@@ -39,9 +39,9 @@ function salvarJson() {
     // Salvar dicionário 'data'
     salvarArquivo(filename, data, function(err) {
         if (err) {
-            alert('failed to save: ' + filename + '\n' + err);
+            alert('Failed to save: ' + filename + '\n' + err);
         } else {
-            alert('saved: ' + filename);
+            alert('Saved: ' + filename);
         }
     });
     
@@ -51,10 +51,10 @@ function salvarJson() {
 // Carregar calibração
 function carregarJson(){
     // Pegar o nome do arquivo
-    var filename = prompt('Digite o nome do arquivo .json:');
+    var filename = prompt('Insert file name (.json not needed):');
     filename = 'calib/' + filename;
     if (filename == ''){
-        alert('Coloque um nome não vazio!');
+        alert('Empty name not valid!');
         return;
     }
     filename += '.json';
@@ -62,7 +62,7 @@ function carregarJson(){
     // Carregá-lo
     carregarArquivo(filename, function(err, data) {
         if (err) {
-            alert('failed to load: ' + filename + '\n' + err);
+            alert('Failed to load: ' + filename + '\n' + err);
         } else {
             // Carregar os dados nas respectivas variáveis
             limparTodasVar();
@@ -87,7 +87,7 @@ function carregarJson(){
             iniciar();
             animar();
             attElementosHTML();
-            alert('loaded: ' + filename);
+            alert('Loaded: ' + filename);
         };  
     });
 };
@@ -97,13 +97,26 @@ function carregarJson(){
 // -----------------------
 // CARREGAMENTO DE ARQUIVOS
 
+// Salvar imagem atual do canvas
+function baixarImagem(){
+    var downloadCanvas = curCanvas == '3d' ? texCanvas : imgCanvas;
+    var dataURL = downloadCanvas.toDataURL("image/png", 1.0);
+    var filename = prompt('Insert the file name for the image (.png not needed):');
+    filename = filename + '.png';
+    var a = document.createElement('a');
+    a.href = dataURL;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+}
+
 // Carregar imagem local do usuário
 function carregarImagemLocal(){
     // Pegar o nome do arquivo
-    var filename = prompt('Digite o nome do arquivo (completo):');
+    var filename = prompt('Insert the file name for the image (with extension):');
     filename = 'images/' + filename;
     if (filename == ''){
-        alert('Coloque um nome não vazio!');
+        alert('Empty name not valid!');
         return;
     };
 

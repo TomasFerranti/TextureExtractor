@@ -8,20 +8,20 @@ function attElementosHTML(){
 
     // Botões guia calibração
     var textoCorreto = (texto) => (texto ? ' ✓' : '');
-    document.getElementById('btGuiaX').innerHTML=('Eixo X' + textoCorreto(lastButton == 'X'));
-    document.getElementById('btGuiaY').innerHTML=('Eixo Y' + textoCorreto(lastButton == 'Y'));
-    document.getElementById('btGuiaZ').innerHTML=('Eixo Z' + textoCorreto(lastButton == 'Z'));        
-    document.getElementById('btExtrair').innerHTML=('Extrair' + textoCorreto(lastButton == 'extrair'));      
+    document.getElementById('btGuiaX').innerHTML=('Axis X' + textoCorreto(lastButton == 'X'));
+    document.getElementById('btGuiaY').innerHTML=('Axis Y' + textoCorreto(lastButton == 'Y'));
+    document.getElementById('btGuiaZ').innerHTML=('Axis Z' + textoCorreto(lastButton == 'Z'));        
+    document.getElementById('btExtrair').innerHTML=('Extract' + textoCorreto(lastButton == 'extrair'));      
 
     // Botões textura
-    document.getElementById('btNovoPlano').innerHTML=('Novo Plano' + textoCorreto(lastButton == 'novoPlano'));
-    document.getElementById('btPlanoYZ').innerHTML=('Plano YZ' + textoCorreto(lastButtonTex == 'YZ'));
-    document.getElementById('btPlanoXZ').innerHTML=('Plano XZ' + textoCorreto(lastButtonTex == 'XZ'));
-    document.getElementById('btPlanoXY').innerHTML=('Plano XY' + textoCorreto(lastButtonTex == 'XY'));
+    document.getElementById('btNovoPlano').innerHTML=('New Plane Type' + textoCorreto(lastButton == 'novoPlano'));
+    document.getElementById('btPlanoYZ').innerHTML=('Plane YZ' + textoCorreto(lastButtonTex == 'YZ'));
+    document.getElementById('btPlanoXZ').innerHTML=('Plane XZ' + textoCorreto(lastButtonTex == 'XZ'));
+    document.getElementById('btPlanoXY').innerHTML=('Plane XY' + textoCorreto(lastButtonTex == 'XY'));
 
     // Botões de novos planos
     for(nome in tiposPlano){
-        tiposPlano[nome]['objeto'].innerHTML=('Plano ' + nome + textoCorreto(lastButtonTex == nome));
+        tiposPlano[nome]['objeto'].innerHTML=('Plane ' + nome + textoCorreto(lastButtonTex == nome));
     }
 
     // Imagem
@@ -81,6 +81,8 @@ function attElementosHTML(){
     }
 
     // Ortocentro
-	ponto(C.x,C.y,10,'pink');
+    if(!C.equals(new THREE.Vector3())){
+        ponto(C.x,C.y,10,'pink');
+    }
 }
 // -----------------------
