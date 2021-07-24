@@ -1,64 +1,34 @@
-# Extrator de Texturas
+# Texture Extractor
 
-Repositório criado para armazenar o código realizado ao projeto Vistas Situadas do Rio de Janeiro (uma colaboração entre a Universidade de Rice, responsável imagineRio, e o Instituto Moreira Salles) pela FGVRJ.
+Repository created to store the code made for the project Vistas Situadas do Rio de Janeiro in FGV-RJ, with collaboration between Rice University, ImagineRio and Instituto Moreira Salles.
 
-## Instalando os requerimentos (Windows)
+## Installing the requirements (Windows)
 
-Para o arquivo .html rodar corretamente são necessárias duas coisas: instalar o Node e o pacote threejs utilizado no Javascript. Com isso, seguem abaixo os links onde você pode baixá-los.
+For the .html file to run correctly its needed two things, the installation of Node and threejs. Below follow the links to where you can download and install both.
 
 ### Node
 
-O Node possui diversas versões. Uma boa prática para manter diversas versões do Node no computador chama-se Node Version Manager (NVM). Contanto, a instalação do NVM é opcional e você pode apenas instalar o Node.
+Node has a lot of versions. A good practice is to maintain multiple Node versions on your computer through Node Version Manager (NVM). However, its installation is optional and you can use only the basic Node.
 
-- Para instalar apenas o Node (recomendado): https://nodejs.org/en/;
-- Para adquirir o NVM: https://github.com/coreybutler/nvm-windows/releases/tag/1.1.7;
+- To download and install Node: https://nodejs.org/en/;
+- NVM release: https://github.com/coreybutler/nvm-windows/releases/tag/1.1.7;
 
-### Pacotes JavaScript
+### JavaScript Packages
 
-Os pacotes utilizados no projeto foram escolhidos de maneira a facilitar o trabalho. Seguem abaixo as descrições:
+The packages used in the project are chosen in a way to make programming easier. Below follows the description of each one of them (currently only threejs):
 
-- O threejs pode ser adquirido pela pasta descompactada do zip que se encontra em https://threejs.org/;
+- Threejs can be downloaded at: https://threejs.org/;
 
-Com isso, a pasta baixada deve se encontrar dentro do diretório "public/packages", como será mostrado na próxima seção.
+The threejs directory named "three.js-master" must be under "public/packages/".
 
-### Verificando a instalação
+### Running Node
 
-Após os passos acima serem seguidos, você deve possuir a pasta packages semelhante a isso:
-
-<img src="markdown_images/packages_files.png">
-
-Com isso, basta agora executar o Node.
-
-### Executando o Node
-
-Após toda a instalação estar correta, basta executar a seguinte linha de código no prompt do Windows (Windows+R digitando cmd)
+To run the Node server you can open Windows Prompt through Windows+R and type "cmd". Then you can switch folders to the project and run the file through 
 
     node nodeServer.js
 
-caso você se encontre na pasta do projeto. Caso não, você pode navegar até ela usando
+If everything is fine a message will pop up saying "listening at http://localhost:8000". This is the link of the local server where the project is hosted. In case any file is updated, you can just refresh this link to check the changes.
 
-    cd "C:\DiretorioDaPasta"
-    
-ou
+## How does it work?
 
-    cd ..
-    
-para sair de uma pasta usando o sistema de arquivos do Windows. Com isso, deve-se aparecer uma mensagem no prompt escrita "listening at http://localhost:8000". Este é o link do servidor local onde o projeto está hospedado. Caso você atualize algum arquivo, para reiniciar a versão no browser basta reatualizar a página.
-
-## Como funciona?
-
-Essa seção se dedica à explicar os funcionamentos desenvolvidos até agora.
-
-### Calibração
-
-Após carregar uma imagem Web ou local (nome completo e salva na pasta images), deve-se calibrar os parâmetros da câmera escolhendo para cada eixo dois pares de segmentos de reta apropriados. Depois disso, clicar em calcular.
-
-Você também pode salvar essa calibração juntamente com a imagem para carregá-las depois, através de salvar calibração e carregar calibração (ficarão salvas na pasta calib).
-
-Atualmente se encontram duas calibrações como exemplo, "cabex1" e "cabex2".
-
-### Extração
-
-Trabalho em andamento, atualmente se pode extrair as texturas da seguinte maneira: primeiro se escolhe o plano paralelo e clica-se no botão extrair. Depois disso, selecione três pontos no canvas da imagem: dois no mesmo eixo e um para "extensão". Com isso, este será criado no ambiente 3D. Para alternar entre o ambiente 3D e 2D basta pressionar a tecla T. O controle da câmera se é realizado através das teclas WASD para movimento de sua posição e SETAS para controle de ângulo.
-
-Assim, para criar outros planos você deve selecionar novamente o novo plano paralelo e clicar no segmento de reta de onde deseja extender, e depois o ponto de extensão. Este também será adicionado à cena 3D.
+Currently there is an article in project to explain all the tool functionalities.
