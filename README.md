@@ -10,8 +10,8 @@ Para o arquivo .html rodar corretamente são necessárias duas coisas: instalar 
 
 O Node possui diversas versões. Uma boa prática para manter diversas versões do Node no computador chama-se Node Version Manager (NVM). Contanto, a instalação do NVM é opcional e você pode apenas instalar o Node.
 
+- Para instalar apenas o Node (recomendado): https://nodejs.org/en/;
 - Para adquirir o NVM: https://github.com/coreybutler/nvm-windows/releases/tag/1.1.7;
-- Para instalar o Node: https://nodejs.org/en/;
 
 ### Pacotes JavaScript
 
@@ -38,8 +38,12 @@ Após toda a instalação estar correta, basta executar a seguinte linha de cód
 caso você se encontre na pasta do projeto. Caso não, você pode navegar até ela usando
 
     cd "C:\DiretorioDaPasta"
+    
+ou
 
-pelo sistema de arquivos do Windows. Com isso, deve-se aparecer uma mensagem no prompt escrita "listening at http://localhost:8000". Este é o link do servidor local onde o projeto está hospedado. Caso você atualize algum arquivo, para reiniciar o servidor basta cancelar o atual usando CTRL+C e executar o Node novamente.
+    cd ..
+    
+para sair de uma pasta usando o sistema de arquivos do Windows. Com isso, deve-se aparecer uma mensagem no prompt escrita "listening at http://localhost:8000". Este é o link do servidor local onde o projeto está hospedado. Caso você atualize algum arquivo, para reiniciar a versão no browser basta reatualizar a página.
 
 ## Como funciona?
 
