@@ -10,9 +10,11 @@ var baseXYZ = new THREE.Matrix3();
 var CO = new THREE.Vector2();
 
 // Função chamada quando se pede o cálculo da calibração da câmera 
-function calc(){
+// tipoCalc é normal quando se tem os três eixos e centrado quando o centro óptico está no centro da imagem
+function calc(tipoCalc){
+
     // Número de pontos guias insuficientes
-    if (pontosGuia[0].length < 4 || pontosGuia[1].length < 4 || pontosGuia[2].length < 4){
+    if (pontosGuia[0].length < 4 || pontosGuia[1].length < 4 || (pontosGuia[2].length < 4 && tipoCalc == 'normal')){
         alert('Please choose two or more segments for each axis!');
         return;
     }
@@ -25,7 +27,9 @@ function calc(){
     // Cálculo dos pontos de fuga
     // Para cada dimensão, ache a intersecção par a par dos pontos
     // Depois, tire a média dessas intersecções
-    for(var j=0; j<3; j++){
+    // Caso o tipoCalc seja centrado, não precisa da terceira dimensão
+    var nDims = 3 - 1 * (tipoCalc == 'centrado');
+    for(var j=0; j<nDims; j++){
         var pontosDeInters = [];
         var tam = pontosGuia[j].length;
         for(var i1=0; i1<tam/2; i1++){
@@ -50,15 +54,37 @@ function calc(){
     // Separando os pontos de fuga
     var Fx = pontosDeFuga[0].clone();
     var Fy = pontosDeFuga[1].clone();
-    var Fz = pontosDeFuga[2].clone();
+    var Fz;
+    // Dividindo os casos de calc para achar CO e Fz
+    if(tipoCalc == 'normal'){
+        Fz = pontosDeFuga[2].clone();
+
+        // Projetar os vetores das arestas do triangulo formado
+        // pelos centros ópticos para achar a base das alturas
+        var hx = proj(Fx.clone().subVectors(Fx,Fy), Fz.clone().subVectors(Fz,Fy), Fy.clone());
+        var hy = proj(Fy.clone().subVectors(Fy,Fz), Fx.clone().subVectors(Fx,Fz), Fz.clone());
+
+        // Cálculo do centro óptico
+        CO = inter_retas(Fx.clone(), hx.clone(), Fy.clone(), hy.clone());
+    }else if(tipoCalc == 'centrado'){
+        // Centro óptico no centro da imagem
+        CO = new THREE.Vector2(imgCanvas.width/2, imgCanvas.height/2);
+
+        var n = Fy.clone().subVectors(Fy,Fx);
+        
+        // Rotaciona 90 graus
+        n = new THREE.Vector2(-n.y,n.x)
+
+        // Calcula t do Fz
+        var t_par = (CO.length()**2 + Fx.dot(Fy) - CO.dot(Fx.clone().addVectors(Fx,Fy)))/(Fx.dot(n)-CO.dot(n));
+        n.multiplyScalar(t_par);
+        Fz = CO.clone().addVectors(CO,n); 
+        pontosDeFuga.push(Fz);
+    }else{
+        alert('Error, type of calc not specified!');
+    }
     
-    // Projetar os vetores das arestas do triangulo formado
-    // pelos centros ópticos para achar a base das alturas
-    var hx = proj(Fx.clone().subVectors(Fx,Fy), Fz.clone().subVectors(Fz,Fy), Fy.clone());
-    var hy = proj(Fy.clone().subVectors(Fy,Fz), Fx.clone().subVectors(Fx,Fz), Fz.clone());
     
-    // Cálculo do centro óptico
-    CO = inter_retas(Fx.clone(), hx.clone(), Fy.clone(), hy.clone());
 
     // Encontrando a altura tridimensional do centro óptico
     var z2 =  ((Fx.x - Fy.x)**2 + (Fx.y - Fy.y)**2) -

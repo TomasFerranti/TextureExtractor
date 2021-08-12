@@ -41,8 +41,8 @@ function carregarImagemWeb() {
 	attElementosHTML();
 };
 
-function calcularCam() {
-	calc();
+function calcularCam(tipoCalc) {
+	calc(tipoCalc);
 	iniciar();
 	animar();
 	attElementosHTML();
