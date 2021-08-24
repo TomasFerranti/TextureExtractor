@@ -10,25 +10,51 @@ texCanvas.width = 1200;
 // Função chamada após calibrar a câmera, fazendo o setup do ambiente 3D
 function iniciar(){
     cena = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(
-        75, // FOV
-        texCanvas.width/texCanvas.height, // Aspect
-        0.001, // Near
+	var w, h, x0, y0, FOV;
+    if (C.x > texCanvas.width - C.x){
+		w = C.x;
+		x0 = 0;
+	}
+	else{
+		w = texCanvas.width - C.x;
+		x0 = w - C.x;
+	}
+	if (C.y > texCanvas.height - C.y){
+		h = C.y;
+		y0 = 0;
+	}
+	else{
+		h = texCanvas.height - C.y;
+		y0 = h - C.y;
+	}
+	FOV = 2*Math.atan2(h, -C.z)*180.0/Math.PI;
+	camera = new THREE.PerspectiveCamera(
+        FOV, // FOV
+        w/h, // Aspect
+        0.1, // Near
         1000 // Far
     );
-    renderizador = new THREE.WebGLRenderer({canvas: texCanvas, 
-                                            preserveDrawingBuffer: true  });
+	camera.setViewOffset(2*w, 2*h, x0, y0, texCanvas.width, texCanvas.height);
+	var up = new THREE.Vector3(0, 1, 0);
+	var upW = cameraParaMundo(up);
+	upW.z = - upW.z;
+	camera.up = upW;
+	var lookAt = new THREE.Vector3(0, 0, 1);
+	var lookAtW = cameraParaMundo(lookAt);
+	camera.lookAt(lookAtW);
+	camera.updateProjectionMatrix();
+    renderizador = new THREE.WebGLRenderer({ canvas: texCanvas });
     renderizador.setSize(texCanvas.width,texCanvas.height);
     
     // Renderizar cena pela primeira vez
     renderizador.render(cena, camera);
 
     // Permite controle da câmera do tipo "Órbita"
-    controles = new THREE.FlyControls( camera, renderizador.domElement );
+    controles = new THREE.FlyControls(camera, renderizador.domElement );
     
     // Configurações desse controle
-    controles.movementSpeed = 0.01;
-    controles.rollSpeed = 0.01;
+    controles.movementSpeed = 0.002;
+    controles.rollSpeed = 0.002;
     controles.autoForward = false;
     controles.dragToLook = true;
 }
@@ -99,58 +125,3 @@ function onWindowResize() {
     renderizador.setSize(texCanvas.width ,texCanvas.height);
 }
 window.addEventListener('resize', onWindowResize, false);
-
-// Atualiza posição e rotação da câmera quando se adiciona um novo plano
-function atualizaCamera(){
-    // Determina o plano
-    var ultimoPlano = planos[planos.length-1];
-    
-    // Calcula o centro
-    var centro = new THREE.Vector3();
-    for(var j=0; j<4; j++){
-        centro.addVectors(centro,ultimoPlano.P[j]);
-    }
-    centro.multiplyScalar(1/4);
-
-    // Calcula a distancia
-    var maxDist = centro.clone().subVectors(centro,planos[0].P[0]).length();
-    var curDist;
-    for(var j=0; j<planos.length; j++){
-        for(var i=0; i<4; i++){
-            curDist = centro.clone().subVectors(centro,planos[j].P[i]).length();
-        } 
-        if(curDist > maxDist){
-            maxDist = curDist;
-        }
-    }
-
-    // Calcula o normal
-    var v1 = ultimoPlano.P[0].clone().subVectors(ultimoPlano.P[1],ultimoPlano.P[0]);
-    var v2 = ultimoPlano.P[0].clone().subVectors(ultimoPlano.P[3],ultimoPlano.P[0]);
-    var normalPlano = v1.clone().crossVectors(v1,v2);
-    normalPlano.multiplyScalar(3/2*maxDist/normalPlano.length());
-    // Inverte caso ponto de fuga de 'z' se encontre abaixo
-    if(pontosDeFuga[2]['y']>=0){
-        normalPlano.multiplyScalar(-1);
-    }
-
-    // Cria o vetor de posição da câmera e o atribui ao objeto
-    var posCamera = centro.clone().addVectors(centro,normalPlano);
-    
-    camera.position.x = posCamera.x;
-    camera.position.y = posCamera.y;
-    camera.position.z = posCamera.z;
-    camera.lookAt(centro.x,centro.y,centro.z);
-
-    // Cria os angulos de rotação da camera e atribui ao objeto
-    var angulos = camera.rotation.toVector3();
-    if(tiposPlano[ultimoPlano['tipoPlano']]['eixoPar'] == 'z'){
-        angulos.x = Math.PI/2;
-        angulos.z = 0;
-    }
-    // Rotacione caso ponto de fuga de 'z' se encontre abaixo
-    if(pontosDeFuga[2]['y']>=0){
-        angulos.z = Math.PI;
-    }
-    camera.rotation.setFromVector3(angulos);
-}

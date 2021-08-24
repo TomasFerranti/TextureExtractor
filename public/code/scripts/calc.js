@@ -11,13 +11,24 @@ var CO = new THREE.Vector2();
 
 // Função chamada quando se pede o cálculo da calibração da câmera 
 // tipoCalc é normal quando se tem os três eixos e centrado quando o centro óptico está no centro da imagem
-function calc(tipoCalc){
+function calc(){
+    // Determinar tipo de calc e qual indice do ponto de fuga está faltando
+    var tipoCalc = 'normal';
+    var indFalt = 0;
+    for(var j=0; j<3; j++){
+        if (pontosGuia[j%3].length == 0 && pontosGuia[(j+1)%3].length > 0 && pontosGuia[(j+2)%3].length > 0){
+            tipoCalc = 'centrado';
+            indFalt = j;
+            break;
+        }
+    }
 
     // Número de pontos guias insuficientes
-    if (pontosGuia[0].length < 4 || pontosGuia[1].length < 4 || (pontosGuia[2].length < 4 && tipoCalc == 'normal')){
+    if ((pontosGuia[indFalt].length < 4 && tipoCalc == 'normal') || pontosGuia[(indFalt+1)%3].length < 4 || pontosGuia[(indFalt+2)%3].length < 4){
         alert('Please choose two or more segments for each axis!');
         return;
     }
+
     // Número de pontos guias ímpares para alguma dimensão (pontos soltos)
     if (pontosGuia[0].length % 2 == 1 || pontosGuia[1].length % 2 == 1 || pontosGuia[2].length % 2 == 1){
         alert('Please finish the remaining segment points of the calibration!');
@@ -27,9 +38,10 @@ function calc(tipoCalc){
     // Cálculo dos pontos de fuga
     // Para cada dimensão, ache a intersecção par a par dos pontos
     // Depois, tire a média dessas intersecções
-    // Caso o tipoCalc seja centrado, não precisa da terceira dimensão
-    var nDims = 3 - 1 * (tipoCalc == 'centrado');
-    for(var j=0; j<nDims; j++){
+    var casosInd = {0:[1,2], 1:[0,2], 2:[0,1]};
+    var indsIte = tipoCalc == 'centrado' ? casosInd[indFalt] : [0,1,2];
+
+    for(var j of indsIte){
         var pontosDeInters = [];
         var tam = pontosGuia[j].length;
         for(var i1=0; i1<tam/2; i1++){
@@ -41,6 +53,7 @@ function calc(tipoCalc){
                 pontosDeInters.push(pontoDeInters);
             }
         }
+
         // Média dos pontos
         pontoDeFuga = new THREE.Vector2();
         for(var i=0; i<pontosDeInters.length; i++){
@@ -51,12 +64,11 @@ function calc(tipoCalc){
         pontosDeFuga.push(pontoDeFuga);
     }
 
-    // Separando os pontos de fuga
-    var Fx = pontosDeFuga[0].clone();
-    var Fy = pontosDeFuga[1].clone();
-    var Fz;
-    // Dividindo os casos de calc para achar CO e Fz
+    var Fx, Fy, Fz;
+    // Dividindo os casos de calc para achar CO e os Fx, Fy, Fz
     if(tipoCalc == 'normal'){
+        Fx = pontosDeFuga[0].clone();
+        Fy = pontosDeFuga[1].clone();
         Fz = pontosDeFuga[2].clone();
 
         // Projetar os vetores das arestas do triangulo formado
@@ -67,6 +79,9 @@ function calc(tipoCalc){
         // Cálculo do centro óptico
         CO = inter_retas(Fx.clone(), hx.clone(), Fy.clone(), hy.clone());
     }else if(tipoCalc == 'centrado'){
+        Fx = pontosDeFuga[0].clone();
+        Fy = pontosDeFuga[1].clone();
+
         // Centro óptico no centro da imagem
         CO = new THREE.Vector2(imgCanvas.width/2, imgCanvas.height/2);
 
@@ -79,7 +94,13 @@ function calc(tipoCalc){
         var t_par = (CO.length()**2 + Fx.dot(Fy) - CO.dot(Fx.clone().addVectors(Fx,Fy)))/(Fx.dot(n)-CO.dot(n));
         n.multiplyScalar(t_par);
         Fz = CO.clone().addVectors(CO,n); 
-        pontosDeFuga.push(Fz);
+
+        // Reordena variáveis:
+        var casosTroca = {0:[2,0,1], 1:[0,2,1], 2:[0,1,2]};
+        pontosDeFuga = [Fx, Fy, Fz];
+        var casoCorreto = casosTroca[indFalt];
+        [Fx, Fy, Fz] = [pontosDeFuga[casoCorreto[0]], pontosDeFuga[casoCorreto[1]], pontosDeFuga[casoCorreto[2]]];
+        pontosDeFuga = [Fx, Fy, Fz];
     }else{
         alert('Error, type of calc not specified!');
     }
@@ -396,7 +417,6 @@ function extrairTextura(mouse){
 
             // Colocar os dados no canvas
             adicQuadrilatero(novoPlano);
-            atualizaCamera();
 
             // Atualizar pontosExtrair para receber próximos pontos
             pontosExtrair = [];
