@@ -31,4 +31,4 @@ If everything is fine a message will pop up saying "listening at http://localhos
 
 ## How does it work?
 
-Currently there is an article in the works to explain all the tool functionalities.
+Currently there is an article and a manual in the works to explain all the tool functionalities.

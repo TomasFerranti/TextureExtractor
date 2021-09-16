@@ -126,8 +126,6 @@ function updateBotao() {
 
 		// Mover o ponto
 		if ((movimento) && (mouseA.button == 'mousemove')){
-			console.log(indCerto);
-			console.log(mouseA.vec.clone().subVectors(mouseA.vec,mouseA.prevVec).length());
 			pontosExtrair[indCerto] = proj(mouseA.vec.clone().subVectors(mouseA.vec,mouseA.prevVec),
 								    pontosExtrair[(indCerto+1)%2].clone().subVectors(pontosExtrair[(indCerto+1)%2],pontosExtrair[indCerto]), 
 									pontosExtrair[indCerto]);
