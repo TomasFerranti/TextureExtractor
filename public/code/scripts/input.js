@@ -87,57 +87,104 @@ function botaoExtrairTextura() {
 
 
 // -----------------------
-// ENTRADA DOS PONTOS CALIBRAÇÃO / EXTRAÇÃO
+// ENTRADA DOS PONTOS CALIBRAÇÃO / EXTRAÇÃO E BOTÕES
 
 // Declarando variáveis globais: pontos guias da calibração e pontos de extração
 var pontosGuia = [[],[],[]];
 var pontosExtrair = [];
 
+
+var mouseA = {vec : new THREE.Vector2(0,0), button : 0, status : 0, prevVec : new THREE.Vector2(0,0), update : true};
+function mouseEvents(e){
+	const bounds = imgCanvas.getBoundingClientRect();
+	mouseA.vec.x = e.pageX - bounds.left - scrollX;
+	mouseA.vec.y = e.pageY - bounds.top - scrollY;
+	mouseA.button = e.type;
+	mouseA.status = e.type === "mousedown" ? true : e.type === "mouseup" ? false : mouseA.status;
+    mouseA.update = true;
+}
+["mousedown","mouseup","mousemove"].forEach(name => imgCanvas.addEventListener(name,mouseEvents));
+
+requestAnimationFrame(updateBotao);
+var movimento = false;
+var indCerto;
 // Clicou no canvas
-imgCanvas.addEventListener('click', function (e) {
-	// Limpar câmera caso esteja calibrando com uma calibração já existente
-	if ((lastButton == 'X' || lastButton == 'Y' || lastButton == 'Z') && (statusCalibracao == 'calculada' || statusCalibracao == 'carregada')){
-		limparTodasVar();
-	}
+function updateBotao() {
+	if(mouseA.update == true){
+		var cursor = "crosshair";
 
-	// Posição do mouse
-	var rect = imgCanvas.getBoundingClientRect();
-	var mouse = new THREE.Vector2(e.pageX-rect.x-window.pageXOffset,e.pageY-rect.y-window.pageYOffset);
+		// Caso esteja movendo algum ponto
+		var ponto;
+		for (var i=0; i<Math.min(2, pontosExtrair.length); i++){
+			ponto = pontosExtrair[i];
+			if ((ponto.clone().subVectors(mouseA.vec,ponto).length() < 6) && (mouseA.button == 'mousedown')){
+				indCerto = i;
+				movimento = true;
+				break;
+			}
+		}
 
-	// Caso esteja fazendo outra coisa depois de criar um novo plano
-	if ((planoSeg.length > 0) && (lastButton != 'novoPlano')){
-		alert('Finish the segment points of the new plane before using another tool!');
+		// Mover o ponto
+		if ((movimento) && (mouseA.button == 'mousemove')){
+			console.log(indCerto);
+			console.log(mouseA.vec.clone().subVectors(mouseA.vec,mouseA.prevVec).length());
+			pontosExtrair[indCerto] = proj(mouseA.vec.clone().subVectors(mouseA.vec,mouseA.prevVec),
+								    pontosExtrair[(indCerto+1)%2].clone().subVectors(pontosExtrair[(indCerto+1)%2],pontosExtrair[indCerto]), 
+									pontosExtrair[indCerto]);
+			cursor = "move";
+		}
+		if (!mouseA.status){
+			movimento = false;
+		}
+		imgCanvas.style.cursor = cursor;
+
+		if ((!movimento) && (mouseA.button == 'mousedown')){
+			// Limpar câmera caso esteja calibrando com uma calibração já existente
+			if ((lastButton == 'X' || lastButton == 'Y' || lastButton == 'Z') && (statusCalibracao == 'calculada' || statusCalibracao == 'carregada')){
+				limparTodasVar();
+			}
+
+			// Caso esteja fazendo outra coisa depois de criar um novo plano
+			if ((planoSeg.length > 0) && (lastButton != 'novoPlano')){
+				alert('Finish the segment points of the new plane before using another tool!');
+				attElementosHTML();
+				return;
+			}
+
+			// Último botão clicado
+			switch (lastButton){
+				case 'X':
+					pontosGuia[0].push(mouseA.vec.clone());
+					break;
+				case 'Y':
+					pontosGuia[1].push(mouseA.vec.clone());
+					break;
+				case 'Z':
+					pontosGuia[2].push(mouseA.vec.clone());
+					break;
+				case 'novoPlano':
+					criarNovoPlano(mouseA.vec.clone());
+					break;
+				case 'extrair':
+					extrairTextura(mouseA.vec.clone());							
+					break;
+				default:
+					// Pass
+			}
+
+		}
+
+		// Atualizar a tela
 		attElementosHTML();
-		return;
-	}
 
-	// Último botão clicado
-	switch (lastButton){
-		case 'X':
-			pontosGuia[0].push(mouse.clone());
-			break;
-		case 'Y':
-			pontosGuia[1].push(mouse.clone());
-			break;
-		case 'Z':
-			pontosGuia[2].push(mouse.clone());
-			break;
-		case 'novoPlano':
-			criarNovoPlano(mouse.clone());
-			break;
-		case 'extrair':
-			extrairTextura(mouse.clone());							
-			break;
-		default:
-			// Pass
+		mouseA.prevVec = mouseA.vec.clone();
+		mouseA.update = false;
 	}
-
-	// Atualizar a tela
-	attElementosHTML();
-});
+	requestAnimationFrame(updateBotao);
+};
 
 var curCanvas = '2d';
-// Clicou para trocar os canvas
+// Pressionou T para trocar o canvas
 document.addEventListener("keyup", function(event) {	
 	if(event.keyCode == 84){
 		if(statusCalibracao == 'naoCalculada'){
@@ -156,4 +203,5 @@ document.addEventListener("keyup", function(event) {
 		};
 	};
 });
+
 // -----------------------

@@ -47,7 +47,7 @@ function attElementosHTML(){
         }
     }
 
-    // Pontos do novo plano atual
+    // Pontos do novo tipo de plano atual
     for (var i = 0; i < planoSeg.length; i++){
         ponto(planoSeg[i].x, planoSeg[i].y, 3, 'violet');
     }
@@ -64,7 +64,7 @@ function attElementosHTML(){
         reta(p1, p2, 'violet');
     }
 
-    // Pontos da textura
+    // Pontos do novo plano a concatenar
     for (var i = 0; i < pontosExtrair.length; i++) {
         ponto(pontosExtrair[i].x, pontosExtrair[i].y, 5,'purple');
     }
