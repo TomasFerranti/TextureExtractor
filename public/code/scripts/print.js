@@ -33,6 +33,11 @@ function mostrarResultados(){
         str = str + '] <br/>';
     }
 
+    // Métrica do segmento escolhido
+    if(segmentoMetrica != null){
+        str = str + 'The current chosen segment for the metric has '+arredondar(segmentoMetrica[0],4)+' meters.';
+    };
+
     document.getElementById('output').innerHTML = str;
 }
 // -----------------------

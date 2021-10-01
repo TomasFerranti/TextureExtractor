@@ -83,6 +83,14 @@ function botaoExtrairTextura() {
 	lastButton = 'extrair';
 	attElementosHTML();
 };
+function botaoNovaMetrica() {
+	lastButton = 'novametrica';
+	attElementosHTML();
+};
+function botaoCalcularTamanho(){
+	lastButton = 'calculartamanho';
+	attElementosHTML();
+}
 // -----------------------
 
 
@@ -165,6 +173,12 @@ function updateBotao() {
 					break;
 				case 'extrair':
 					extrairTextura(mouseA.vec.clone());							
+					break;
+				case 'novametrica':
+					novaMetrica(mouseA.vec.clone());
+					break;
+				case 'calculartamanho':
+					calcularTamanho(mouseA.vec.clone());
 					break;
 				default:
 					// Pass

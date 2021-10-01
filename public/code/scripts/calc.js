@@ -211,9 +211,9 @@ class Plano {
         Fh = desprojetarTela(Fh,null,null);
         var eixo = tiposPlano[lastButtonTex]['eixoPar'];
         var P = [desprojetarTela2(v[0].clone(),Fh,pontoDoPlano,eixo), 
-                    desprojetarTela2(v[1].clone(),Fh,pontoDoPlano,eixo), 
-                    desprojetarTela2(v[2].clone(),Fh,pontoDoPlano,eixo), 
-                    0]; 
+                 desprojetarTela2(v[1].clone(),Fh,pontoDoPlano,eixo), 
+                 desprojetarTela2(v[2].clone(),Fh,pontoDoPlano,eixo), 
+                 0]; 
 
         // Atribuir à classe
         this.v = criarCopia(v);
@@ -413,13 +413,89 @@ function extrairTextura(mouse){
 
             // Obter os outros pontos e a textura através da classe Plano
             var novoPlano = new Plano(indPlano,indSeg); 
-            planos.push(novoPlano);
 
-            // Colocar os dados no canvas
-            adicQuadrilatero(novoPlano);
+            // Checar se o novo plano possui pontos de projeção dentro dos paralelogramos de outros planos
+            var flagDentroPlanos = false;
+            var centroPlano = new THREE.Vector2();
+            for(var i=0; i<4; i++){
+                centroPlano.addVectors(centroPlano, novoPlano.v[i]);
+                if(dentroPlanos(novoPlano.v[i])[0]){
+                    flagDentroPlanos = true;
+                }
+            }
+            centroPlano.multiplyScalar(1/4);
+            if(dentroPlanos(centroPlano)[0]){
+                flagDentroPlanos = true;
+            }
+
+            // Se é um plano válido
+            if(flagDentroPlanos){
+                alert('Not a valid plane!');
+            }else{
+                planos.push(novoPlano);
+                adicQuadrilatero(novoPlano);
+            }
 
             // Atualizar pontosExtrair para receber próximos pontos
             pontosExtrair = [];
     };
 }
+
+var pontosMetrica = [];
+var escalaMundoMetro = null;
+// Função para uma nova métrica
+function novaMetrica(mouse){
+    if(statusCalibracao == 'naoCalculada' && planos.length==0){
+        alert('Camera calibration and an initial plane is needed!');
+        return;
+    }
+    if(pontosMetrica.length == 0 || pontosMetrica.length == 2){
+        pontosMetrica = [mouse];
+    }else{
+        pontosMetrica.push(mouse);
+        // Condições para cálculo
+        var pontosMetricaRes = [dentroPlanos(pontosMetrica[0]),dentroPlanos(pontosMetrica[1])];
+        if(pontosMetricaRes[0][0] == false || pontosMetricaRes[1][0] == false || pontosMetricaRes[0][1] != pontosMetricaRes[1][1]){
+            alert('Invalid segment! Please choose a valid one.');
+            pontosMetrica = [];
+            return;
+        };
+
+        // Descobrir escala no mundo tridimensional destes pontos
+        var plano = planos[pontosMetricaRes[0][1]];
+        var pontoDoPlano = plano.P[0];
+        var Fh = tiposPlano[plano.tipoPlano]['pontoDeFuga'];
+        Fh = desprojetarTela(Fh,null,null);
+        var eixo = tiposPlano[plano.tipoPlano]['eixoPar'];
+        var P = [desprojetarTela2(pontosMetrica[0].clone(),Fh,pontoDoPlano,eixo), 
+                 desprojetarTela2(pontosMetrica[1].clone(),Fh,pontoDoPlano,eixo)];
+        var escalaMundo = P[0].clone().subVectors(P[0],P[1]).length();
+
+        // Definindo a razão da escala
+        var escalaMetro = parseFloat(prompt("What's the length of this segment in meters?"));
+        escalaMundoMetro = escalaMetro/escalaMundo;
+    };
+};
+
+var segmentoMetrica = null;
+// Função para calcular o comprimento de um segmento
+function calcularTamanho(mouse){
+    if(escalaMundoMetro==null){
+        alert('A metric is needed first!');
+        return;
+    };
+
+    // Achar segmento mais próximo do mouse
+    var indPlanoSeg, indSegSeg;
+    [indPlanoSeg, indSegSeg] = segmentoMaisProximo(mouse.clone());
+
+    // Calcular seu tamanho e armazenar os seus dados
+    var P1, P2;
+    [P1, P2] = [planos[indPlanoSeg].P[indSegSeg], planos[indPlanoSeg].P[(indSegSeg+1)%4]]
+    segmentoMetrica = [P1.clone().subVectors(P1,P2).length()*escalaMundoMetro,
+                       indPlanoSeg,
+                       indSegSeg];
+                       
+    mostrarResultados();
+};
 // -----------------------
