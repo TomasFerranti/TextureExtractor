@@ -26,9 +26,17 @@ function salvarJson() {
             pontosGuiaData[j].push(pontosGuia[j][i].toArray());
         }
     }
+    
+    // Canvas criado para transforma a imagem em dataURL
+    var utilCanvas = document.createElement('canvas');
+    var utilCanvasCtx = utilCanvas.getContext('2d');
+    utilCanvas.width = imgImagem.width;
+    utilCanvas.height = imgImagem.height;
+    utilCanvasCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
+                                       0, 0, imgImagem.width, imgImagem.height);
 
     // Dados salvos no .json
-    var data = {'imagem':imgCanvasSec.toDataURL(),
+    var data = {'imagem':utilCanvas.toDataURL(),
                 'pontosguia':pontosGuiaData,
                 'pontosfuga':[pontosDeFuga[0].toArray(),pontosDeFuga[1].toArray(),pontosDeFuga[2].toArray()],
                 'base':baseXYZ.toArray(),
@@ -78,6 +86,9 @@ function carregarJson(){
                     pontosGuia[j].push(criarObjeto(pontosGuiaData[j][i]));
                 }
             };
+            wInicio = 0;
+            hInicio = 0; 
+            cEscala = 0;
             imgImagem.src = data.imagem;
             statusCalibracao = 'carregada';
 
@@ -119,6 +130,10 @@ function carregarImagemLocal(){
         alert('Empty name not valid!');
         return;
     };
+
+    wInicio = 0;
+	hInicio = 0; 
+	cEscala = 0;
 
     // Carregá-lo
     imgImagem.src = filename;  

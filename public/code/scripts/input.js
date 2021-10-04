@@ -11,19 +11,43 @@ var statusCalibracao = 'naoCalculada';
 var imgImagem = new Image();
 imgImagem.crossOrigin = '';
 
+// Canvas secreto com a imagem original desenhada
+var imgCanvasSec = document.createElement('canvas');
+var imgCtxSec = imgCanvasSec.getContext('2d');
+imgCanvasSec.width = imgCanvas.width;
+imgCanvasSec.height = imgCanvas.height;
+
 // Imagem padrão
 imgImagem.src = 'images/ex1.png';
 
 // Troca de imagem
+var wInicio = 0;
+var hInicio = 0; 
+var cEscala = 0;
 imgImagem.onload = function(){
-	imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
-	imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-								0, 0, imgCanvas.width, imgCanvas.height); 
+	var razaoAspectoImagem = imgImagem.width/imgImagem.height;
+	var razaoAspectoCanvas = imgCanvas.width/imgCanvas.height;
 
+	imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
 	imgCtxSec.clearRect(0, 0, imgCanvasSec.width, imgCanvasSec.height);
-	imgCtxSec.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-								0, 0, imgCanvasSec.width, imgCanvasSec.height);
-	
+
+	// Heurística para preservar o aspecto de razão da imagem carregada
+	if(razaoAspectoCanvas > razaoAspectoImagem){
+		cEscala = imgCanvas.height/imgImagem.height;
+		wInicio = Math.trunc((imgCanvas.width - cEscala*imgImagem.width)/2);
+		imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
+			wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height); 
+		imgCtxSec.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
+			wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height);
+	}else{
+		cEscala = imgCanvas.width/imgImagem.width;
+		hInicio = Math.trunc((imgCanvas.height - cEscala*imgImagem.height)/2);
+		imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
+			wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height); 
+		imgCtxSec.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
+			wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height);
+	};
+
 	attElementosHTML();
 };
 
@@ -36,6 +60,9 @@ imgImagem.onload = function(){
 
 function carregarImagemWeb() {
 	x = prompt('Insert the URL of the desired image!');
+	wInicio = 0;
+	hInicio = 0; 
+	cEscala = 0;
 	imgImagem.src = x;
 	limparTodasVar();
 	attElementosHTML();
@@ -83,8 +110,8 @@ function botaoExtrairTextura() {
 	lastButton = 'extrair';
 	attElementosHTML();
 };
-function botaoNovaMetrica() {
-	lastButton = 'novametrica';
+function botaoNovaEscala() {
+	lastButton = 'novaescala';
 	attElementosHTML();
 };
 function botaoCalcularTamanho(){
@@ -174,7 +201,7 @@ function updateBotao() {
 				case 'extrair':
 					extrairTextura(mouseA.vec.clone());							
 					break;
-				case 'novametrica':
+				case 'novaescala':
 					novaMetrica(mouseA.vec.clone());
 					break;
 				case 'calculartamanho':
@@ -191,7 +218,7 @@ function updateBotao() {
 
 		mouseA.prevVec = mouseA.vec.clone();
 		mouseA.update = false;
-	}
+	};
 	requestAnimationFrame(updateBotao);
 };
 

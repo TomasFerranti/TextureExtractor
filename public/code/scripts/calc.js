@@ -378,12 +378,6 @@ class Plano {
     }
 }
 
-// Canvas secreto com a imagem original desenhada
-var imgCanvasSec = document.createElement('canvas');
-var imgCtxSec = imgCanvasSec.getContext('2d');
-imgCanvasSec.width = imgCanvas.width;
-imgCanvasSec.height = imgCanvas.height;
-
 // Variáveis globais do canvas da textura
 var planos = [];
 var indPlano, indSeg;
@@ -401,6 +395,7 @@ function extrairTextura(mouse){
         case 0: case 1:
             if(planos.length==0){
                 pontosExtrair.push(mouse.clone());
+                [indPlano, indSeg] = [null, null];
             }else{
                 [indPlano, indSeg] = segmentoMaisProximo(mouse.clone());
                 pontosExtrair.push(planos[indPlano].v[indSeg%4]);
@@ -455,7 +450,15 @@ function novaMetrica(mouse){
         pontosMetrica.push(mouse);
         // Condições para cálculo
         var pontosMetricaRes = [dentroPlanos(pontosMetrica[0]),dentroPlanos(pontosMetrica[1])];
-        if(pontosMetricaRes[0][0] == false || pontosMetricaRes[1][0] == false || pontosMetricaRes[0][1] != pontosMetricaRes[1][1]){
+        var typeplane1 = null;
+        var typeplane2 = null;
+        if(pontosMetricaRes[0][1] != null){
+            typeplane1 = planos[pontosMetricaRes[0][1]].tipoPlano;
+        };
+        if(pontosMetricaRes[1][1] != null){
+            typeplane2 = planos[pontosMetricaRes[1][1]].tipoPlano;
+        };
+        if(pontosMetricaRes[0][0] == false || pontosMetricaRes[1][0] == false || typeplane1 != typeplane2){
             alert('Invalid segment! Please choose a valid one.');
             pontosMetrica = [];
             return;
@@ -477,7 +480,8 @@ function novaMetrica(mouse){
     };
 };
 
-var segmentoMetrica = null;
+var segmentoMetrica = [];
+var segmentoMetricaTamanho = null;
 // Função para calcular o comprimento de um segmento
 function calcularTamanho(mouse){
     if(escalaMundoMetro==null){
@@ -485,17 +489,40 @@ function calcularTamanho(mouse){
         return;
     };
 
-    // Achar segmento mais próximo do mouse
-    var indPlanoSeg, indSegSeg;
-    [indPlanoSeg, indSegSeg] = segmentoMaisProximo(mouse.clone());
+    if(segmentoMetrica.length == 0 || segmentoMetrica.length == 2){
+        segmentoMetrica = [mouse];
+    }else{
+        segmentoMetrica.push(mouse);
+        // Condições para cálculo
+        var segmentoMetricaRes = [dentroPlanos(segmentoMetrica[0]),dentroPlanos(segmentoMetrica[1])];
+        var typeplane1 = null;
+        var typeplane2 = null;
+        if(segmentoMetricaRes[0][1] != null){
+            typeplane1 = planos[segmentoMetricaRes[0][1]].tipoPlano;
+        };
+        if(segmentoMetricaRes[1][1] != null){
+            typeplane2 = planos[segmentoMetricaRes[1][1]].tipoPlano;
+        };
+        if(segmentoMetricaRes[0][0] == false || segmentoMetricaRes[1][0] == false || typeplane1 != typeplane2){
+            alert('Invalid segment! Please choose a valid one.');
+            segmentoMetrica = [];
+            return;
+        };
 
-    // Calcular seu tamanho e armazenar os seus dados
-    var P1, P2;
-    [P1, P2] = [planos[indPlanoSeg].P[indSegSeg], planos[indPlanoSeg].P[(indSegSeg+1)%4]]
-    segmentoMetrica = [P1.clone().subVectors(P1,P2).length()*escalaMundoMetro,
-                       indPlanoSeg,
-                       indSegSeg];
-                       
-    mostrarResultados();
+        // Calcular seu tamanho e armazenar os seus dados
+        var plano = planos[segmentoMetricaRes[0][1]];
+        var pontoDoPlano = plano.P[0];
+        var Fh = tiposPlano[plano.tipoPlano]['pontoDeFuga'];
+        Fh = desprojetarTela(Fh,null,null);
+        var eixo = tiposPlano[plano.tipoPlano]['eixoPar'];
+        var P = [desprojetarTela2(segmentoMetrica[0].clone(),Fh,pontoDoPlano,eixo), 
+                 desprojetarTela2(segmentoMetrica[1].clone(),Fh,pontoDoPlano,eixo)];
+        segmentoMetricaTamanho = P[0].clone().subVectors(P[0],P[1]).length();
+        segmentoMetricaTamanho = segmentoMetricaTamanho*escalaMundoMetro;
+                        
+        mostrarResultados();
+    };
+
+
 };
 // -----------------------

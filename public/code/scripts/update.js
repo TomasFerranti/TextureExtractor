@@ -20,8 +20,8 @@ function attElementosHTML(){
     document.getElementById('btPlanoXY').innerHTML=('Plane XY' + textoCorreto(lastButtonTex == 'XY'));
 
     // Botões métrica
-    document.getElementById('btNovaMetrica').innerHTML=('New Metric' + textoCorreto(lastButton == 'novametrica'));
-    document.getElementById('btCalcularTamanho').innerHTML=('Segment Length' + textoCorreto(lastButton == 'calculartamanho'));
+    document.getElementById('btNovaMetrica').innerHTML=('Defining Scale' + textoCorreto(lastButton == 'novaescala'));
+    document.getElementById('btCalcularTamanho').innerHTML=('Calculate Segment Length' + textoCorreto(lastButton == 'calculartamanho'));
 
     // Botões de novos planos
     for(nome in tiposPlano){
@@ -32,7 +32,7 @@ function attElementosHTML(){
     imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
     try{
     imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-                                0, 0, imgCanvas.width, imgCanvas.height); 
+                     wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height); 
     } catch(e){};
     
     // Pontos dos eixos
@@ -92,7 +92,7 @@ function attElementosHTML(){
     // Pontos da definição da métrica
     if(pontosMetrica.length>0){
         for(var p of pontosMetrica){
-            ponto(p.x,p.y,3,'brown');
+            ponto(p.x,p.y,3,'black');
         };
     };
 
@@ -101,10 +101,16 @@ function attElementosHTML(){
         reta(pontosMetrica[0],pontosMetrica[1],'brown');
     };
 
-    // Segmento atual sendo calculado tamanho
-    if(segmentoMetrica!=null){
-        reta(planos[segmentoMetrica[1]].v[segmentoMetrica[2]],planos[segmentoMetrica[1]].v[(segmentoMetrica[2]+1)%4],
-            'black');
-    }
+    // Pontos da definição do segmento que calculamos pela métrica
+    if(segmentoMetrica.length>0){
+        for(var p of segmentoMetrica){
+            ponto(p.x,p.y,3,'black');
+        };
+    };
+
+    // Segmento definido por esses pontos
+    if(segmentoMetrica.length==2){
+        reta(segmentoMetrica[0],segmentoMetrica[1],'teal');
+    };
 };
 // -----------------------

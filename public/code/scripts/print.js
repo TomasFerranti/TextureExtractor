@@ -34,8 +34,8 @@ function mostrarResultados(){
     }
 
     // Métrica do segmento escolhido
-    if(segmentoMetrica != null){
-        str = str + 'The current chosen segment for the metric has '+arredondar(segmentoMetrica[0],4)+' meters.';
+    if(segmentoMetricaTamanho != null){
+        str = str + 'The current chosen segment for the metric has '+arredondar(segmentoMetricaTamanho,4)+' meters.';
     };
 
     document.getElementById('output').innerHTML = str;

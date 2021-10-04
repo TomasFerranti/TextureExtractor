@@ -50,9 +50,16 @@ function limparVarCamera(){
     document.getElementById('output').innerHTML = 'Camera calibration is needed <br/> for variables to show up.';
     pontosMetrica = [];
     escalaMundoMetro = null;
-    segmentoMetrica = null;
+    segmentoMetrica = [];
+    segmentoMetricaTamanho = null;
+    planos = [];
+    for (const [key, value] of Object.entries(tiposPlano)) {
+        if(!(['XY','YZ','XZ'].includes(key))){
+            value['objeto'].parentNode.removeChild(value['objeto']);
+            delete(tiposPlano[key]);
+        }
+    };
 };
-
 // Limpar os pontos do canvas
 function limparPontosCanvas(){
     pontosGuia = [[],[],[]];
