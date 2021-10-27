@@ -43,7 +43,7 @@ function iniciar(){
 	var lookAtW = cameraParaMundo(lookAt);
 	camera.lookAt(lookAtW);
 	camera.updateProjectionMatrix();
-    renderizador = new THREE.WebGLRenderer({ canvas: texCanvas });
+    renderizador = new THREE.WebGLRenderer({ canvas: texCanvas, preserveDrawingBuffer: true });
     renderizador.setSize(texCanvas.width,texCanvas.height);
     
     // Renderizar cena pela primeira vez
@@ -124,4 +124,4 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderizador.setSize(texCanvas.width ,texCanvas.height);
 }
-window.addEventListener('resize', onWindowResize, false);
+//window.addEventListener('resize', onWindowResize, false);

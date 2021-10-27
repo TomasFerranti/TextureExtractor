@@ -18,7 +18,7 @@ imgCanvasSec.width = imgCanvas.width;
 imgCanvasSec.height = imgCanvas.height;
 
 // Imagem padrão
-imgImagem.src = 'images/ex1.png';
+imgImagem.src = 'images/ex4.jfif';
 
 // Troca de imagem
 var wInicio = 0;
