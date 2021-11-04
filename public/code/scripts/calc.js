@@ -140,6 +140,11 @@ function calc(){
 // -----------------------
 // EXTRAÇÃO DA TEXTURA
 
+// Canvas da textura
+var texCanvasPlano = document.getElementById('texturaCanvasPlano');
+var texCanvasPlanoCtx = texCanvasPlano.getContext('2d');
+
+
 // Criar um novo tipo de plano a partir do segmento paralelo e eixo paralelo
 var tiposPlano = {};
 // Guardar os pontos em planoSeg
@@ -149,30 +154,35 @@ function criarNovoPlano(mouse){
     if(baseXYZ.equals(new THREE.Matrix3())){
         alert('Camera calibration is needed!');
         return;
-    }
+    };
     planoSeg.push(mouse);
     if (planoSeg.length == 2){
         // Coletar dados do plano e criar seu objeto
         var nome = prompt('Insert the new plane type name!');
         var eixoPar = prompt('Insert the parallel axis to this plane (x,y or z)!');
-        var divPlanos = document.getElementById('planos');
-        var novoObjeto = document.createElement('a');
-        novoObjeto.onclick = function (){
-            lastButtonTex = nome;
-            attElementosHTML();
-        };
-        novoObjeto.id = 'btPlano'+nome;
-        novoObjeto.innerText = 'Plano ' + nome;
-        var extrairChild = document.getElementById("btExtrair");
-        novoObjeto = divPlanos.insertBefore(novoObjeto, extrairChild);
+        criarNovoTipoPlano(nome,eixoPar);
+    };
+};
 
-        // Calcular seu ponto de fuga e armazená-lo
-        var coordInd = coordEixoInd[eixoPar];
-        var Fh = inter_retas(planoSeg[0], planoSeg[1], pontosDeFuga[(coordInd+1)%3], pontosDeFuga[(coordInd+2)%3]);
-        tiposPlano[nome] = {'planoSeg':planoSeg, 'pontoDeFuga':Fh, 'eixoPar':eixoPar, 'objeto':novoObjeto};
-        planoSeg = []
-    }
-}
+// Criar o novo tipo de plano
+function criarNovoTipoPlano(nome,eixoPar){
+    var divPlanos = document.getElementById('planos');
+    var novoObjeto = document.createElement('a');
+    novoObjeto.onclick = function (){
+        lastButtonTex = nome;
+        attElementosHTML();
+    };
+    novoObjeto.id = 'btPlano'+nome;
+    novoObjeto.innerText = 'Plano ' + nome;
+    var extrairChild = document.getElementById("btExtrair");
+    novoObjeto = divPlanos.insertBefore(novoObjeto, extrairChild);
+
+    // Calcular seu ponto de fuga e armazená-lo
+    var coordInd = coordEixoInd[eixoPar];
+    var Fh = inter_retas(planoSeg[0], planoSeg[1], pontosDeFuga[(coordInd+1)%3], pontosDeFuga[(coordInd+2)%3]);
+    tiposPlano[nome] = {'planoSeg':planoSeg, 'pontoDeFuga':Fh, 'eixoPar':eixoPar, 'objeto':novoObjeto};
+    planoSeg = [];
+};
 
 // Adicionar os dados dos planos paralelos aos ortogonais comuns 'YZ', 'XZ' e 'XY'
 var coordEixo = {'YZ':'z','XZ':'z','XY':'x'};
@@ -183,19 +193,26 @@ function adicionarDadosPlanosOrts(){
                             'pontoDeFuga':pontosDeFuga[coordFuga[nome]], 
                             'eixoPar':coordEixo[nome], 
                             'objeto':document.getElementById('btPlano'+nome)};
-    }
-}
+    };
+};
 
 var coordDic = {'YZ':'x','XZ':'y','XY':'z'};
 // Classe criada para representar os planos
 class Plano {
     // Chamado na instanciação
-    constructor(indPlano,indSeg) {
+    constructor(indPlano,indSeg,tipoPlano,v=[0,0,0,0],P=[0,0,0,0]) {
         // Atributos iniciais
         this.indPlanoCon = indPlano;
         this.indSegCon = indSeg;
-        this.tipoPlano = lastButtonTex;
+        this.tipoPlano = tipoPlano;
 
+        // Atribuir à classe
+        this.v = v;
+        this.P = P;
+    };
+
+    // Obtém o restante dos pontos na tela e no espaço
+    obterPontos(){
         // v são os pontos do canvas 2D
         var v = [pontosExtrair[0], pontosExtrair[1], pontosExtrair[2], 0];
 
@@ -205,26 +222,20 @@ class Plano {
         if(indPlano==null){
             pontoDoPlano = new THREE.Vector3(1,1,1);
         }else{
-            pontoDoPlano = planos[indPlano].P[indSeg];
+            pontoDoPlano = planos[this.indPlanoCon].P[this.indSegCon];
         };
-        var Fh = tiposPlano[lastButtonTex]['pontoDeFuga'];
+        var Fh = tiposPlano[this.tipoPlano]['pontoDeFuga'];
         Fh = desprojetarTela(Fh,null,null);
-        var eixo = tiposPlano[lastButtonTex]['eixoPar'];
+        var eixo = tiposPlano[this.tipoPlano]['eixoPar'];
         var P = [desprojetarTela2(v[0].clone(),Fh,pontoDoPlano,eixo), 
                  desprojetarTela2(v[1].clone(),Fh,pontoDoPlano,eixo), 
                  desprojetarTela2(v[2].clone(),Fh,pontoDoPlano,eixo), 
                  0]; 
-
+        
         // Atribuir à classe
         this.v = criarCopia(v);
         this.P = criarCopia(P);
 
-        // Terminar de preencher os pontos
-        this.obterPontos();
-    }
-
-    // Obtém o restante dos pontos na tela e no espaço
-    obterPontos(){
         // Preencher P corretamente
         var subP = criarCopia(this.P);
         this.P = [];
@@ -307,10 +318,7 @@ class Plano {
         for(var j=0; j<4; j++){
             this.v[j] = projetarTela(this.P[j].clone());
         }
-
-        // Extrair a textura
-        this.obterTextura();
-    }
+    };
 
     obterTextura(){
         var v = this.v;
@@ -370,13 +378,30 @@ class Plano {
                 buffer[pos+1] = pix_rgb['y'];
                 buffer[pos+2] = pix_rgb['z'];
                 buffer[pos+3] = 255;
-            }
-        }
-
+            };
+        };
+                          
         // Adiciona a textura como atributo da classe
         this.textura = imgData;
-    }
-}
+
+        // Coloca textura no canvas lateral
+        var tempImg = imagedataParaImage(rotacionar90graus(imgData));
+        [w, h] = [h, w]; 
+        var cEscalaTex = 0, wInicioTex = 0, hInicioTex = 0;
+        if(texCanvasPlano.width/texCanvasPlano.height > w/h){
+            cEscalaTex = texCanvasPlano.height/h;
+            wInicioTex = Math.trunc((texCanvasPlano.width - cEscalaTex*w)/2);
+        }else{
+            cEscalaTex = texCanvasPlano.width/w;
+            hInicioTex = Math.trunc((texCanvasPlano.height - cEscalaTex*h)/2);
+        };
+        tempImg.onload = function(){
+            texCanvasPlanoCtx.clearRect(0, 0, texCanvasPlano.width, texCanvasPlano.height);
+            texCanvasPlanoCtx.drawImage(tempImg, 0, 0, w, h,    
+                                        wInicioTex, hInicioTex, cEscalaTex*w, cEscalaTex*h);
+        };
+    };
+};
 
 // Variáveis globais do canvas da textura
 var planos = [];
@@ -407,7 +432,13 @@ function extrairTextura(mouse){
             pontosExtrair.push(mouse);
 
             // Obter os outros pontos e a textura através da classe Plano
-            var novoPlano = new Plano(indPlano,indSeg); 
+            var novoPlano = new Plano(indPlano,indSeg,lastButtonTex); 
+
+            // Terminar de preencher os pontos
+            novoPlano.obterPontos();
+
+            // Extrair a textura
+            novoPlano.obterTextura();
 
             // Checar se o novo plano possui pontos de projeção dentro dos paralelogramos de outros planos
             var flagDentroPlanos = false;

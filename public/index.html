@@ -17,6 +17,8 @@
                   <a href='javascript:carregarImagemWeb()'>Load Image (web)</a>
                   <a href='javascript:carregarImagemLocal()'>Load Image (local)</a>
                   <a href='javascript:baixarImagem()'>Download Image (canvas)</a>
+                  <a href='javascript:salvarJson()'>Save Progress (.json)</a>
+                  <a href='javascript:carregarJson()'>Load Progress (.json)</a>
                 </div>
             </div>
             <div class='dropdown'>
@@ -26,8 +28,6 @@
                   <a id='btGuiaY' href='javascript:guiaY()'>Axis Y</a>
                   <a id='btGuiaZ' href='javascript:guiaZ()'>Axis Z</a>
                   <a href='javascript:calcularCam()'>Calibrate</a>
-                  <a href='javascript:salvarJson()'>Save Calibration (.json)</a>
-                  <a href='javascript:carregarJson()'>Load Calibration (.json)</a>
                 </div>
             </div>
             <div class='dropdown'>
@@ -55,6 +55,14 @@
             </div>            
             <div id='textDiv'>
                 <span id ='output'> Camera calibration is needed <br/> for variables to show up. </span>    
+            </div>
+                     
+            <div id='textDiv'>
+                <span id ='dica'>  </span>    
+            </div>
+
+            <div id='textDiv'>
+                <canvas id = 'texturaCanvasPlano' height= '300' width = '300'></canvas>
             </div>
         </div>
     </div>

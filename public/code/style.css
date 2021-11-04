@@ -1,20 +1,20 @@
 body {
-    margin: 0px;
-    background: #d4d6d8;
+  margin: 0px;
+  background: #d4d6d8;
 }
 
 #universo {
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0 auto;
+  position: relative;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
 }
 
 #controles {
-    position: relative;
-    height: 5%;
-    margin: 0px;
-    border: 3px solid black;
+  position: relative;
+  height: 5%;
+  margin: 0px;
+  border: 3px solid black;
 }
 
 #subDiv{
@@ -33,11 +33,11 @@ body {
 }
 
 canvas {
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    background: white;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  background: white;
 }
 
 #textDiv{
@@ -48,41 +48,41 @@ canvas {
 }
 
 span {
-    text-align: left;
+  text-align: left;
 }
 
 .dropdown-bt {
-    display: block;
-    min-width: 160px;
-    height: 100%;
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-  }
-  
-  .dropdown {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .dropdown-conteudo {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    min-width: 100%;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-  }
-  
-  .dropdown-conteudo a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-  }
-  
-  .dropdown-conteudo a:hover {background-color: #ddd;}
-  
-  .dropdown:hover .dropdown-conteudo {display: block;}
-  
-  .dropdown:hover .dropdown-bt {background-color: #3e8e41;}
+  display: block;
+  min-width: 160px;
+  height: 100%;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-conteudo {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 100%;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-conteudo a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-conteudo a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-conteudo {display: block;}
+
+.dropdown:hover .dropdown-bt {background-color: #3e8e41;}

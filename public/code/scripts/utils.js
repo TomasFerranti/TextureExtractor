@@ -40,6 +40,22 @@ function imagedataParaImage(imagedataEscondido) {
     return imageEscondido;
 };
 
+// Rotacionar imagedata em 90 graus
+function rotacionar90graus(imageData){
+    var colunas = imageData.width; linhas = imageData.height;
+    var novoImageData = criarImagem(linhas, colunas);
+    var buffer = novoImageData.data;
+    for(var i=0; i < colunas; i++){
+        for(var j=0; j < linhas; j++){
+            buffer[4*(i*linhas + j)] = imageData.data[4*(j*colunas+i)];
+            buffer[4*(i*linhas + j)+1] = imageData.data[4*(j*colunas+i)+1];
+            buffer[4*(i*linhas + j)+2] = imageData.data[4*(j*colunas+i)+2];
+            buffer[4*(i*linhas + j)+3] = imageData.data[4*(j*colunas+i)+3];
+        };
+    };
+    return novoImageData;
+};
+
 // Limpar as variáveis de camera
 function limparVarCamera(){
     statusCalibracao = 'naoCalculada';
@@ -53,6 +69,7 @@ function limparVarCamera(){
     segmentoMetrica = [];
     segmentoMetricaTamanho = null;
     planos = [];
+    texCanvasPlanoCtx.clearRect(0, 0, texCanvasPlano.width, texCanvasPlano.height);
     for (const [key, value] of Object.entries(tiposPlano)) {
         if(!(['XY','YZ','XZ'].includes(key))){
             value['objeto'].parentNode.removeChild(value['objeto']);
@@ -312,6 +329,19 @@ function criarObjeto(arr){
         default:
     };
     return(objeto);
+};
+
+// Criar o objeto do THREE a partir de um array de dicionários
+function criarObjetoArrDic(arrDic){
+    var arr = [];
+    for(var dic of arrDic){
+        if(Object.keys(dic).length == 2){
+            arr.push(new THREE.Vector2(dic.x,dic.y));
+        }else{
+            arr.push(new THREE.Vector3(dic.x,dic.y,dic.z));
+        };
+    };
+    return arr;
 };
 
 // Funções novas com a adição de planos paralelos à um eixo

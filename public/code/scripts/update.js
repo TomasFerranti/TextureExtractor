@@ -6,6 +6,9 @@
 // Quando ela é chamada, atualiza todos os elementos do HTML
 function attElementosHTML(){
 
+    // Atualizar dica
+    atualizarDica();
+
     // Botões guia calibração
     var textoCorreto = (texto) => (texto ? ' ✓' : '');
     document.getElementById('btGuiaX').innerHTML=('Axis X' + textoCorreto(lastButton == 'X'));

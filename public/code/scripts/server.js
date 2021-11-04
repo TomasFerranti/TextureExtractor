@@ -5,18 +5,14 @@
 
 // Salvar calibração
 function salvarJson() {
-    var filename = prompt('Insert file name:');
-    filename = 'calib/' + filename;
-    if (filename == ''){
-        alert('Empty name not valid!');
+    if(nomeArquivoImagem == ''){
+        alert("You can't save progress of a non local image file.");
         return;
-    }
-    filename += '.json';
+    };
 
-    if (baseXYZ.equals(new THREE.Matrix3())){
-        alert('Camera calibration is needed!');
-        return;
-    }
+    var nomeImagem = nomeArquivoImagem.split('.')[0];
+    var filename = 'calib/' + 'cab-' + nomeImagem + '.json';
+    var extensao = nomeArquivoImagem.split('.')[1];
 
     // Salvar pontos guia em um formato de leitura aceitável
     var pontosGuiaData = []
@@ -24,24 +20,33 @@ function salvarJson() {
         pontosGuiaData.push([])
         for(var i=0; i<pontosGuia[j].length; i++){
             pontosGuiaData[j].push(pontosGuia[j][i].toArray());
-        }
-    }
-    
-    // Canvas criado para transforma a imagem em dataURL
-    var utilCanvas = document.createElement('canvas');
-    var utilCanvasCtx = utilCanvas.getContext('2d');
-    utilCanvas.width = imgImagem.width;
-    utilCanvas.height = imgImagem.height;
-    utilCanvasCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-                                       0, 0, imgImagem.width, imgImagem.height);
+        };
+    };
+
+    var planosData = JSON.parse(JSON.stringify(planos));
+    for(var j=0; j<planosData.length; j++){
+        delete(planosData[j].textura);
+    };
+    planosData = JSON.stringify(planosData);
+
+    var tiposPlanosData = JSON.parse(JSON.stringify(tiposPlano));
+    for(var tipoPlano of ['XY','YZ','XZ']){
+        delete(tiposPlanosData[tipoPlano]);
+    };
+    for(var tipoPlano of Object.keys(tiposPlanosData)){
+        delete(tiposPlanosData[tipoPlano]['objeto']);
+    };
 
     // Dados salvos no .json
-    var data = {'imagem':utilCanvas.toDataURL(),
+    var data = {'nomeImagem':nomeImagem,
+                'extensao':extensao,
                 'pontosguia':pontosGuiaData,
                 'pontosfuga':[pontosDeFuga[0].toArray(),pontosDeFuga[1].toArray(),pontosDeFuga[2].toArray()],
                 'base':baseXYZ.toArray(),
                 'centrooptico':CO.toArray(),
-                'camera':C.toArray()};
+                'camera':C.toArray(),
+                'tiposPlanos':tiposPlanosData,
+                'planos':planosData};
     data = JSON.stringify(data);
 
     // Salvar dicionário 'data'
@@ -59,13 +64,12 @@ function salvarJson() {
 // Carregar calibração
 function carregarJson(){
     // Pegar o nome do arquivo
-    var filename = prompt('Insert file name (.json not needed):');
-    filename = 'calib/' + filename;
-    if (filename == ''){
-        alert('Empty name not valid!');
+    if (nomeArquivoImagem == ''){
+        alert("You can't load progress of a non local image file.");
         return;
-    }
-    filename += '.json';
+    };
+
+    var filename = 'calib/' + 'cab-' + nomeArquivoImagem.split('.')[0] + '.json';
 
     // Carregá-lo
     carregarArquivo(filename, function(err, data) {
@@ -73,8 +77,8 @@ function carregarJson(){
             alert('Failed to load: ' + filename + '\n' + err);
         } else {
             // Carregar os dados nas respectivas variáveis
-            limparTodasVar();
             data = JSON.parse(data);
+            carregarImagemLocal(data.nomeImagem+'.'+data.extensao);
             baseXYZ = criarObjeto(data.base);
             C = criarObjeto(data.camera);
             CO = criarObjeto(data.centrooptico);
@@ -84,12 +88,8 @@ function carregarJson(){
             for(var j=0; j<3; j++){
                 for(var i=0; i<pontosGuiaData[j].length; i++){
                     pontosGuia[j].push(criarObjeto(pontosGuiaData[j][i]));
-                }
+                };
             };
-            wInicio = 0;
-            hInicio = 0; 
-            cEscala = 0;
-            imgImagem.src = data.imagem;
             statusCalibracao = 'carregada';
 
             // Atualizar as variáveis gerais
@@ -97,6 +97,28 @@ function carregarJson(){
             mostrarResultados();
             iniciar();
             animar();
+
+            // Carregar tipos de planos
+            var tiposPlanosData = data.tiposPlanos;
+            for(var tipoPlano of Object.keys(tiposPlanosData)){
+                planoSeg = criarObjetoArrDic(tiposPlanosData[tipoPlano]['planoSeg']);
+                criarNovoTipoPlano(tipoPlano,tiposPlanosData[tipoPlano]['eixoPar']);
+            };
+            planoSeg = [];
+
+            // Carregar planos
+            var planosData = JSON.parse(data.planos);
+            for(var plano of planosData){
+                var novoPlano = new Plano(plano.indPlanoCon,
+                                          plano.indSegCon,
+                                          plano.tipoPlano,
+                                          criarObjetoArrDic(plano.v),
+                                          criarObjetoArrDic(plano.P));
+                novoPlano.obterTextura();
+                planos.push(novoPlano);
+                adicQuadrilatero(novoPlano);
+            };
+
             attElementosHTML();
             alert('Loaded: ' + filename);
         };  
@@ -122,18 +144,21 @@ function baixarImagem(){
 }
 
 // Carregar imagem local do usuário
-function carregarImagemLocal(){
+function carregarImagemLocal(nomeImg = ''){
     // Pegar o nome do arquivo
-    var filename = prompt('Insert the file name for the image (with extension):');
-    filename = 'images/' + filename;
-    if (filename == ''){
-        alert('Empty name not valid!');
-        return;
+    var filename;
+    if(nomeImg==''){
+        filename = prompt('Insert the file name for the image (with extension):');
+        if (filename == ''){
+            alert('Empty name not valid!');
+            return;
+        };
+    }else{
+        filename = nomeImg;
     };
+    nomeArquivoImagem = filename;
 
-    wInicio = 0;
-	hInicio = 0; 
-	cEscala = 0;
+    filename = 'images/' + filename;
 
     // Carregá-lo
     imgImagem.src = filename;  

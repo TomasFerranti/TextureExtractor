@@ -18,12 +18,11 @@ imgCanvasSec.width = imgCanvas.width;
 imgCanvasSec.height = imgCanvas.height;
 
 // Imagem padrão
-imgImagem.src = 'images/ex4.jfif';
+imgImagem.src = 'images/ex1.png';
+var nomeArquivoImagem = 'ex1.png';
 
+var wInicio, hInicio, cEscala;
 // Troca de imagem
-var wInicio = 0;
-var hInicio = 0; 
-var cEscala = 0;
 imgImagem.onload = function(){
 	var razaoAspectoImagem = imgImagem.width/imgImagem.height;
 	var razaoAspectoCanvas = imgCanvas.width/imgCanvas.height;
@@ -31,22 +30,23 @@ imgImagem.onload = function(){
 	imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
 	imgCtxSec.clearRect(0, 0, imgCanvasSec.width, imgCanvasSec.height);
 
+	wInicio = 0;
+	hInicio = 0; 
+	cEscala = 0;
+
 	// Heurística para preservar o aspecto de razão da imagem carregada
 	if(razaoAspectoCanvas > razaoAspectoImagem){
 		cEscala = imgCanvas.height/imgImagem.height;
 		wInicio = Math.trunc((imgCanvas.width - cEscala*imgImagem.width)/2);
-		imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-			wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height); 
-		imgCtxSec.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-			wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height);
 	}else{
 		cEscala = imgCanvas.width/imgImagem.width;
 		hInicio = Math.trunc((imgCanvas.height - cEscala*imgImagem.height)/2);
-		imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-			wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height); 
-		imgCtxSec.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
-			wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height);
 	};
+
+	imgCtx.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
+		wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height); 
+	imgCtxSec.drawImage(imgImagem, 0, 0, imgImagem.width, imgImagem.height,    
+		wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height);
 
 	attElementosHTML();
 };
@@ -60,10 +60,8 @@ imgImagem.onload = function(){
 
 function carregarImagemWeb() {
 	x = prompt('Insert the URL of the desired image!');
-	wInicio = 0;
-	hInicio = 0; 
-	cEscala = 0;
 	imgImagem.src = x;
+	nomeArquivoImagem = '';
 	limparTodasVar();
 	attElementosHTML();
 };
