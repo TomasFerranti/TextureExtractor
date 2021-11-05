@@ -22,6 +22,9 @@ function attElementosHTML(){
     document.getElementById('btPlanoXZ').innerHTML=('Plane XZ' + textoCorreto(lastButtonTex == 'XZ'));
     document.getElementById('btPlanoXY').innerHTML=('Plane XY' + textoCorreto(lastButtonTex == 'XY'));
 
+    // Botão textura plano
+    document.getElementById('btTexturaPlano').innerHTML=('Check Plane Texture' + textoCorreto(lastButton == 'texturaPlano'));
+
     // Botões métrica
     document.getElementById('btNovaMetrica').innerHTML=('Defining Scale' + textoCorreto(lastButton == 'novaescala'));
     document.getElementById('btCalcularTamanho').innerHTML=('Calculate Segment Length' + textoCorreto(lastButton == 'calculartamanho'));
@@ -78,13 +81,26 @@ function attElementosHTML(){
     
     // Planos
     for (var j = 0; j < planos.length; j++) {
+        if(j != indiceTexturaPlanoAtual){
+            for (var i = 0; i < 4; i++) {
+                ponto(planos[j].v[i].x, planos[j].v[i].y, 3,'orange');
+            };
+            for (var i = 0; i < 3; i++) {
+                reta(planos[j].v[i],planos[j].v[i+1],'yellow');
+            };
+            reta(planos[j].v[3],planos[j].v[0],'yellow');
+        };
+    };
+
+    // Plano destacado
+    if(indiceTexturaPlanoAtual != null){
         for (var i = 0; i < 4; i++) {
-            ponto(planos[j].v[i].x, planos[j].v[i].y, 3,'orange');
+            ponto(planos[indiceTexturaPlanoAtual].v[i].x, planos[indiceTexturaPlanoAtual].v[i].y, 3,'darkgreen');
         };
         for (var i = 0; i < 3; i++) {
-            reta(planos[j].v[i],planos[j].v[i+1],'yellow');
+            reta(planos[indiceTexturaPlanoAtual].v[i],planos[indiceTexturaPlanoAtual].v[i+1],'lime');
         };
-        reta(planos[j].v[3],planos[j].v[0],'yellow');
+        reta(planos[indiceTexturaPlanoAtual].v[3],planos[indiceTexturaPlanoAtual].v[0],'lime');
     };
 
     // Ortocentro

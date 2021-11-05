@@ -115,9 +115,12 @@ function carregarJson(){
                                           criarObjetoArrDic(plano.v),
                                           criarObjetoArrDic(plano.P));
                 novoPlano.obterTextura();
+                plotarTexturaPlano(novoPlano.textura);
                 planos.push(novoPlano);
                 adicQuadrilatero(novoPlano);
             };
+
+            indiceTexturaPlanoAtual = planosData.length-1;
 
             attElementosHTML();
             alert('Loaded: ' + filename);

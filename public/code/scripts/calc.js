@@ -325,10 +325,10 @@ class Plano {
         var P = this.P;
 
         // Heurística de aspect ratio
-        var dx = (v[0].clone().subVectors(v[0],v[1]).length() + v[2].clone().subVectors(v[2],v[3]).length())/2;
-        var dy = (v[0].clone().subVectors(v[0],v[3]).length() + v[1].clone().subVectors(v[1],v[2]).length())/2;
-        var Dx = P[0].clone().subVectors(P[0],P[1]).length();
-        var Dy = P[1].clone().subVectors(P[1],P[2]).length();
+        var dy = (v[0].clone().subVectors(v[0],v[1]).length() + v[2].clone().subVectors(v[2],v[3]).length())/2;
+        var dx = (v[0].clone().subVectors(v[0],v[3]).length() + v[1].clone().subVectors(v[1],v[2]).length())/2;
+        var Dy = P[0].clone().subVectors(P[0],P[1]).length();
+        var Dx = P[1].clone().subVectors(P[1],P[2]).length();
         var a = Dy/Dx;
         if (dy/dx > a) {
             var w = arredondar(dx,0);
@@ -352,9 +352,9 @@ class Plano {
         for (var i = 0; i < h; i++) {
             for (var j = 0; j < w; j++) {
                 // A direção para onde os pixels andam
-                curdt['x'] = dt1.x*i/h + dt2.x*j/w;
-                curdt['y'] = dt1.y*i/h + dt2.y*j/w;
-                curdt['z'] = dt1.z*i/h + dt2.z*j/w;
+                curdt['x'] = dt1.x*j/w + dt2.x*i/h;
+                curdt['y'] = dt1.y*j/w + dt2.y*i/h;
+                curdt['z'] = dt1.z*j/w + dt2.z*i/h;
                 curpix = P[0].clone().addVectors(P[0],curdt);
 
                 // Criar os objetos para interpolação bilinear
@@ -383,23 +383,6 @@ class Plano {
                           
         // Adiciona a textura como atributo da classe
         this.textura = imgData;
-
-        // Coloca textura no canvas lateral
-        var tempImg = imagedataParaImage(rotacionar90graus(imgData));
-        [w, h] = [h, w]; 
-        var cEscalaTex = 0, wInicioTex = 0, hInicioTex = 0;
-        if(texCanvasPlano.width/texCanvasPlano.height > w/h){
-            cEscalaTex = texCanvasPlano.height/h;
-            wInicioTex = Math.trunc((texCanvasPlano.width - cEscalaTex*w)/2);
-        }else{
-            cEscalaTex = texCanvasPlano.width/w;
-            hInicioTex = Math.trunc((texCanvasPlano.height - cEscalaTex*h)/2);
-        };
-        tempImg.onload = function(){
-            texCanvasPlanoCtx.clearRect(0, 0, texCanvasPlano.width, texCanvasPlano.height);
-            texCanvasPlanoCtx.drawImage(tempImg, 0, 0, w, h,    
-                                        wInicioTex, hInicioTex, cEscalaTex*w, cEscalaTex*h);
-        };
     };
 };
 
@@ -458,6 +441,8 @@ function extrairTextura(mouse){
             if(flagDentroPlanos){
                 alert('Not a valid plane!');
             }else{
+                plotarTexturaPlano(novoPlano.textura);
+                indiceTexturaPlanoAtual = planos.length;
                 planos.push(novoPlano);
                 adicQuadrilatero(novoPlano);
             }

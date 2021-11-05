@@ -113,10 +113,19 @@ function atualizarDica(){
                 str += 'Choose the option "Calculate Segment Length" under "Scaling" to find the length of a segment. <br/>';
             };
         };
+
+        if(indiceTexturaPlanoAtual != null){
+            str += '<br/>';
+            if(lastButton == 'texturaPlano'){
+                str += 'Click on the canvas inside a plane to select it for texture highlighting. <br/>';
+            }else{
+                str += 'Choose the option "Check Plane Texture" under "Extraction" if you want to pick another plane for texture highlighting. <br/>';
+            };
+        };
     };
     
     document.getElementById('dica').innerHTML = str;
-}
+};
 
 // Mostrar resultados da calibração
 function mostrarResultados(){

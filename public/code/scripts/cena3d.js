@@ -64,7 +64,8 @@ function adicQuadrilatero(plano){
     var quad_vertices_vec = criarCopia(plano.P);
     var imagem = imagedataParaImage(plano.textura);
     var quad_vertices = [];
-    for(var i=0; i<=3; i++){
+    var correct_order = [1,2,3,0]; // lower-left, lower-right, upper-right, upper-left
+    for(var i of correct_order){
         quad_vertices.push(quad_vertices_vec[i].x);
         quad_vertices.push(quad_vertices_vec[i].y);
         quad_vertices.push(quad_vertices_vec[i].z);
@@ -72,15 +73,15 @@ function adicQuadrilatero(plano){
     
     // Designa ordem dos vértices para desenho
     var quad_uvs = [
-    0.0, 1.0,
-    1.0, 1.0,
+    0.0, 0.0,
     1.0, 0.0,
-    0.0, 0.0
+    1.0, 1.0,
+    0.0, 1.0
     ];
     
     // Designa ordem dos vértices para desenho dos triângulos
     var quad_indices = [
-    0, 2, 1, 0, 3, 2
+    0, 1, 2, 2, 3, 0
     ];
 
     // Cria a textura e objeto

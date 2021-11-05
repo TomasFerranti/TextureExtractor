@@ -103,7 +103,11 @@ function guiaZ() {
 function botaoNovoPlano() {
 	lastButton = 'novoPlano';
 	attElementosHTML();
-}
+};
+function botaoTexturaPlano() {
+	lastButton = 'texturaPlano';
+	attElementosHTML();
+};
 function botaoExtrairTextura() {
 	lastButton = 'extrair';
 	attElementosHTML();
@@ -205,6 +209,9 @@ function updateBotao() {
 				case 'calculartamanho':
 					calcularTamanho(mouseA.vec.clone());
 					break;
+				case 'texturaPlano':
+					checarTexturaPlano(mouseA.vec.clone());
+					break;
 				default:
 					// Pass
 			}
@@ -220,6 +227,29 @@ function updateBotao() {
 	requestAnimationFrame(updateBotao);
 };
 
+// Verificar entrada da textura do plano indicado
+function checarTexturaPlano(mouseData){
+	if(statusCalibracao == 'naoCalculada'){
+		alert('Camera calibration is needed!');
+		return;
+	};
+	var flagLoop = true;
+	for(var i=0; i<planos.length; i++){
+		if(dentroParalelogramo(mouseData,planos[i].v[0],planos[i].v[1],planos[i].v[2],planos[i].v[3])){
+			indiceTexturaPlanoAtual = i;
+			flagLoop = false;
+			break;
+		};
+	};
+
+	if(flagLoop){
+		alert('Please click a point inside a plane.');
+		return;
+	};
+
+	plotarTexturaPlano(planos[i].textura);
+};
+
 var curCanvas = '2d';
 // Pressionou T para trocar o canvas
 document.addEventListener("keyup", function(event) {	
@@ -227,7 +257,7 @@ document.addEventListener("keyup", function(event) {
 		if(statusCalibracao == 'naoCalculada'){
 			alert('Camera calibration is needed!');
 			return;
-		}
+		};
 		if(curCanvas == '2d'){
 			imgCanvas.parentNode.insertBefore(texCanvas, imgCanvas.nextSibling);
         	imgCanvas.parentNode.removeChild(imgCanvas);

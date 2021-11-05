@@ -40,25 +40,10 @@ function imagedataParaImage(imagedataEscondido) {
     return imageEscondido;
 };
 
-// Rotacionar imagedata em 90 graus
-function rotacionar90graus(imageData){
-    var colunas = imageData.width; linhas = imageData.height;
-    var novoImageData = criarImagem(linhas, colunas);
-    var buffer = novoImageData.data;
-    for(var i=0; i < colunas; i++){
-        for(var j=0; j < linhas; j++){
-            buffer[4*(i*linhas + j)] = imageData.data[4*(j*colunas+i)];
-            buffer[4*(i*linhas + j)+1] = imageData.data[4*(j*colunas+i)+1];
-            buffer[4*(i*linhas + j)+2] = imageData.data[4*(j*colunas+i)+2];
-            buffer[4*(i*linhas + j)+3] = imageData.data[4*(j*colunas+i)+3];
-        };
-    };
-    return novoImageData;
-};
-
 // Limpar as variáveis de camera
 function limparVarCamera(){
     statusCalibracao = 'naoCalculada';
+    indiceTexturaPlanoAtual = null;
     pontosDeFuga = [];
     C = new THREE.Vector3();  
     baseXYZ = new THREE.Matrix3();
@@ -373,6 +358,26 @@ function desprojetarTela2(v, dw, p0, eixo) {
     var t = p0.dot(n)/Qw.dot(n);
     Qw.multiplyScalar(t);
     return Qw;
+};
+
+// Coloca textura de um plano no canvas lateral
+var indiceTexturaPlanoAtual = null;
+function plotarTexturaPlano(textura){
+    var tempImg = imagedataParaImage(textura);
+    var [w,h] = [tempImg.width, tempImg.height];
+    var cEscalaTex = 0, wInicioTex = 0, hInicioTex = 0;
+    if(texCanvasPlano.width/texCanvasPlano.height > w/h){
+        cEscalaTex = texCanvasPlano.height/h;
+        wInicioTex = Math.trunc((texCanvasPlano.width - cEscalaTex*w)/2);
+    }else{
+        cEscalaTex = texCanvasPlano.width/w;
+        hInicioTex = Math.trunc((texCanvasPlano.height - cEscalaTex*h)/2);
+    };
+    tempImg.onload = function(){
+        texCanvasPlanoCtx.clearRect(0, 0, texCanvasPlano.width, texCanvasPlano.height);
+        texCanvasPlanoCtx.drawImage(tempImg, 0, 0, w, h,    
+                                    wInicioTex, hInicioTex, cEscalaTex*w, cEscalaTex*h);
+    };
 };
 
 // -----------------------
