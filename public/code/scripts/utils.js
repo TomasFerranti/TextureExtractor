@@ -364,16 +364,16 @@ function desprojetarTela2(v, dw, p0, eixo) {
 var indiceTexturaPlanoAtual = null;
 function plotarTexturaPlano(textura){
     var tempImg = imagedataParaImage(textura);
-    var [w,h] = [tempImg.width, tempImg.height];
-    var cEscalaTex = 0, wInicioTex = 0, hInicioTex = 0;
-    if(texCanvasPlano.width/texCanvasPlano.height > w/h){
-        cEscalaTex = texCanvasPlano.height/h;
-        wInicioTex = Math.trunc((texCanvasPlano.width - cEscalaTex*w)/2);
-    }else{
-        cEscalaTex = texCanvasPlano.width/w;
-        hInicioTex = Math.trunc((texCanvasPlano.height - cEscalaTex*h)/2);
-    };
     tempImg.onload = function(){
+        var [w,h] = [tempImg.width, tempImg.height];
+        var cEscalaTex = 0, wInicioTex = 0, hInicioTex = 0;
+        if(texCanvasPlano.width/texCanvasPlano.height > w/h){
+            cEscalaTex = texCanvasPlano.height/h;
+            wInicioTex = Math.trunc((texCanvasPlano.width - cEscalaTex*w)/2);
+        }else{
+            cEscalaTex = texCanvasPlano.width/w;
+            hInicioTex = Math.trunc((texCanvasPlano.height - cEscalaTex*h)/2);
+        };
         texCanvasPlanoCtx.clearRect(0, 0, texCanvasPlano.width, texCanvasPlano.height);
         texCanvasPlanoCtx.drawImage(tempImg, 0, 0, w, h,    
                                     wInicioTex, hInicioTex, cEscalaTex*w, cEscalaTex*h);

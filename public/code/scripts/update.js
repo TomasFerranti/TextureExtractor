@@ -3,6 +3,7 @@
 // -----------------------
 // FUNÇÃO ATUALIZAR
 
+var desenharCab = true;
 // Quando ela é chamada, atualiza todos os elementos do HTML
 function attElementosHTML(){
 
@@ -41,37 +42,44 @@ function attElementosHTML(){
                      wInicio, hInicio, cEscala*imgImagem.width, cEscala*imgImagem.height); 
     } catch(e){};
     
-    // Pontos dos eixos
-    for (var j = 0; j < 3; j++){        
-        for (var i = 0; i < pontosGuia[j].length; i++) {
-            ponto(pontosGuia[j][i].x, pontosGuia[j][i].y, 3,'black');
+    if(desenharCab){
+        // Pontos dos eixos
+        for (var j = 0; j < 3; j++){        
+            for (var i = 0; i < pontosGuia[j].length; i++) {
+                ponto(pontosGuia[j][i].x, pontosGuia[j][i].y, 3,'black');
+            };
         };
-    };
-    
-    // Linhas
-    var corLinha = ['red','green','blue'];
-    for (var j = 0; j < 3; j++){        
-        var tam = pontosGuia[j].length;
-        for (var i = 0; i < (tam-tam%2)/2; i++) {
-            reta(pontosGuia[j][2*i],pontosGuia[j][2*i+1],corLinha[j]);
+
+        // Linhas
+        var corLinha = ['red','green','blue'];
+        for (var j = 0; j < 3; j++){        
+            var tam = pontosGuia[j].length;
+            for (var i = 0; i < (tam-tam%2)/2; i++) {
+                reta(pontosGuia[j][2*i],pontosGuia[j][2*i+1],corLinha[j]);
+            };
+        };
+        
+        // Ortocentro
+        if(!C.equals(new THREE.Vector3())){
+            ponto(C.x,C.y,10,'pink');
+        };
+
+        // Pontos e Segmentos dos novos planos já adicionados
+        for (nomePlano in tiposPlano){
+            if(['XY','YZ','XZ'].includes(nomePlano)){
+                continue;
+            };
+            var p1 = tiposPlano[nomePlano]['planoSeg'][0];
+            var p2 = tiposPlano[nomePlano]['planoSeg'][1];
+            ponto(p1.x, p1.y, 3, 'violet');
+            ponto(p2.x, p2.y, 3, 'violet');
+            reta(p1, p2, 'violet');
         };
     };
 
     // Pontos do novo tipo de plano atual
     for (var i = 0; i < planoSeg.length; i++){
         ponto(planoSeg[i].x, planoSeg[i].y, 3, 'violet');
-    };
-
-    // Pontos e Segmentos dos novos planos já adicionados
-    for (nomePlano in tiposPlano){
-        if(['XY','YZ','XZ'].includes(nomePlano)){
-            continue;
-        };
-        var p1 = tiposPlano[nomePlano]['planoSeg'][0];
-        var p2 = tiposPlano[nomePlano]['planoSeg'][1];
-        ponto(p1.x, p1.y, 3, 'violet');
-        ponto(p2.x, p2.y, 3, 'violet');
-        reta(p1, p2, 'violet');
     };
 
     // Pontos do novo plano a concatenar
@@ -101,11 +109,6 @@ function attElementosHTML(){
             reta(planos[indiceTexturaPlanoAtual].v[i],planos[indiceTexturaPlanoAtual].v[i+1],'lime');
         };
         reta(planos[indiceTexturaPlanoAtual].v[3],planos[indiceTexturaPlanoAtual].v[0],'lime');
-    };
-
-    // Ortocentro
-    if(!C.equals(new THREE.Vector3())){
-        ponto(C.x,C.y,10,'pink');
     };
 
     // Pontos da definição da métrica
