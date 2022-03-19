@@ -1,4 +1,4 @@
-# Texture Extractor
+# Building Texture Extractor
 
 Repository created to store the code made for the project Vistas Situadas do Rio de Janeiro in FGV-RJ, with collaboration between Rice University, ImagineRio and Instituto Moreira Salles.
 
