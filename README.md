@@ -23,7 +23,7 @@ The threejs directory named "three.js-master" must be under "public/packages/".
 
 ### Running Node
 
-To run the Node server you can open Windows Prompt through Windows+R and type "cmd". Then you can switch folders to the project and run the file through 
+To run the Node server you can open Windows Prompt through Windows+R and type "cmd". For Linux users this is just Ctrl+Alt+T. Then you can switch folders to the project and run the file through 
 
     node nodeServer.js
 
