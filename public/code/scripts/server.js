@@ -120,8 +120,12 @@ function carregarJson(){
                 adicQuadrilatero(novoPlano);
             };
 
-            indiceTexturaPlanoAtual = planosData.length-1;
-
+            if (planosData.length == 0){
+                indiceTexturaPlanoAtual = null;
+            }else{
+                indiceTexturaPlanoAtual = planosData.length - 1;
+            }
+            
             attElementosHTML();
             alert('Loaded: ' + filename);
         };  

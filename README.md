@@ -31,4 +31,7 @@ If everything is fine a message will pop up saying "listening at http://localhos
 
 ## How does it work?
 
-Currently there is an article and a manual in the works to explain all the tool functionalities.
+It is available two documentos for you to understand how to use the tool and what is behind the code. They are:
+
+- All tool functionalities and how to use them are explained in the file "tool_manual.pdf"; 
+- For the theory behind it, there is an article available at https://sol.sbc.org.br/index.php/wvc/article/view/18906 which explains all details of formulas and their code implementations.
