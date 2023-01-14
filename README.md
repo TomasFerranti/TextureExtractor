@@ -1,3 +1,5 @@
+This repository is no longer maintained. Please refer to https://github.com/TomasFerranti/DataScienceDissertation for recent releases.
+
 # Building Texture Extractor
 
 Repository created to store the code made for the project Vistas Situadas do Rio de Janeiro in FGV-RJ, with collaboration between Rice University, ImagineRio and Instituto Moreira Salles.
